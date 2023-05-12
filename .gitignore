@@ -1,0 +1,14 @@
+node_modules
+# Keep environment variables out of version control
+.env
+# Ignore log files
+node_modules/
+.DS_Store
+Thumbs.db
+dist/
+build/
+logs/
+.vscode/
+.idea/
+tests/
+Readme.js
