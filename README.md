@@ -2,8 +2,6 @@
 
 - express --no-view . =>to start the project
 
-*
-
 > to start an express project we use npx express-generator
 > or npx express-generator --no-view to not use the view engine
 > or to install it with npm install express-generator -g

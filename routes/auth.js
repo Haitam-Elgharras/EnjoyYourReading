@@ -1,0 +1,49 @@
+/*jwt is a json web token that we use to authenticate the user 
+and it works like a session but it's more secure and it's stateless
+*/
+const jwt = require("jsonwebtoken");
+var Joi = require("joi");
+const config = require("config");
+var express = require("express");
+var router = express.Router();
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
+//the authententication need just the email and the password
+
+router.post("/", async (req, res, next) => {
+  const userSchema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+  });
+  const { error, value } = userSchema.validate(req.body);
+  if (error) {
+    // Handle validation error
+    res.status(400).send("verify the email or the password length");
+  }
+
+  var user = await prisma.user.findUnique({
+    where: {
+      email: req.body.email,
+    },
+  });
+  //  const token = user.generateAuthToken();
+  if (user == {}) res.status(400).send("invalid email or password");
+  if (user.password == req.body.password) {
+    // it's a best practice to store the private key in an environment variable
+    //and also prefix it with the name of the app like blog_jwtPrivateKey
+    const token = jwt.sign(
+      {
+        iduser: user.iduser,
+      },
+      config.get("jwtPrivateKey")
+    );
+    //I have a problem with the scure key it's always take the value from the default.json file
+    res.send(token);
+  } else res.status(400).send("invalid email or password");
+});
+/*
+I need to work on the authentication so I create a file names auth.js in the routes folder then
+but I still have a problem with the authentication it always says n 
+ */
+module.exports = router;

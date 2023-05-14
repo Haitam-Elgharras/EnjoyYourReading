@@ -5,8 +5,12 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-function getAllUsers() {
-  return prisma.user.findMany();
+//the getAllUsers function accepte two parameters take and skip to make pagination
+function getAllUsers(take, skip) {
+  return prisma.user.findMany({
+    take: take,
+    skip: skip,
+  });
 }
 
 function getUserById(id) {

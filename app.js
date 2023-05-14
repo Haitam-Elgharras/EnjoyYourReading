@@ -1,13 +1,20 @@
+const config = require("config");
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-
+//after we need to set the jwtPrivateKey in the terminal by typing: set blog_jwtPrivateKey=yourPrivateKey
+//or we can set it in the config\custom-environment-variables.json file by typing: "blog_jwtPrivateKey":"yourPrivateKey"
+if (!config.get("jwtPrivateKey")) {
+  console.error("FATAL ERROR: jwtPrivateKey is not defined.");
+  process.exit(1);
+}
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var articlesRouter = require("./routes/articles");
 var categoriesRouter = require("./routes/categories");
 var commentairesRouter = require("./routes/commentaires");
+var authRouter = require("./routes/auth");
 
 var app = express();
 
@@ -24,5 +31,6 @@ app.use("/users", usersRouter);
 app.use("/articles", articlesRouter);
 app.use("/categories", categoriesRouter);
 app.use("/commentaires", commentairesRouter);
+app.use("/auth", authRouter);
 
 module.exports = app;

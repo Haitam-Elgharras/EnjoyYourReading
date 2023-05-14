@@ -24,7 +24,11 @@ model user {
   //relation between the user and the article as a foriegn key as the user can have many articles so we declare the relation as a one to many
   article     article[]
   commentaire commentaire[]
+//I need to add a function to the user model for generating a token so I can use it in the auth middleware to authenticate the user 
+//I will use the jsonwebtoken package to generate the token
+//I will use the bcryptjs package to hash the password AND THis is the code for the function
 }
+
 
 //the user can be an admin or an author (admin, author)
 //here we define the Role as an enum which means that the role can only be one of the two values

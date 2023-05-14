@@ -7,10 +7,18 @@
   },
   "dependencies": {
     "@prisma/client": "^4.14.0",
+    "config": "^3.3.9",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "faker": "^6.6.6",
+    "joi": "^17.9.2",
+    "jsonwebtoken": "^9.0.0",
     "morgan": "~1.9.1"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma",
+    "seed": "node seeds/seed.js"
   },
   "devDependencies": {
     "prisma": "^4.14.0"
