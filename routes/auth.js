@@ -16,30 +16,33 @@ router.post("/", async (req, res, next) => {
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
   });
-  const { error, value } = userSchema.validate(req.body);
-  if (error) {
-    // Handle validation error
-    res.status(400).send("verify the email or the password length");
-  }
-
+  // const { error, value } = userSchema.validate(req.body);
+  //   if (error) {
+  //     // Handle validation error
+  //     res.status(400).send("verify the email or the password length");
+  //   }
   var user = await prisma.user.findUnique({
     where: {
       email: req.body.email,
     },
   });
+  // .catch((err) => res.json(err));
   //  const token = user.generateAuthToken();
-  if (user == {}) res.status(400).send("invalid email or password");
+  if (user == {} || user == null)
+    return res.status(400).send("invalid email or password");
   if (user.password == req.body.password) {
     // it's a best practice to store the private key in an environment variable
     //and also prefix it with the name of the app like blog_jwtPrivateKey
     const token = jwt.sign(
       {
         iduser: user.iduser,
+        email: user.email,
       },
       config.get("jwtPrivateKey")
     );
     //I have a problem with the scure key it's always take the value from the default.json file
-    res.send(token);
+    //if a user login with a valid email and password we send a token to the user and the x-auth-token in the header of the response
+    return res.header("x-auth-token", token).send(token);
   } else res.status(400).send("invalid email or password");
 });
 /*

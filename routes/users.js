@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const auth = require("../middleware/auth");
 const {
   getAllUsers,
   getUserById,
@@ -14,7 +15,7 @@ const {
 //get all users must have two parameters take and skip to make pagination and the url will be like this : http://localhost:3000/users?take=2&skip=2
 //if we don't use the take and skip parameters the default value will be 10
 router.get("/", (req, res, next) => {
-  const take = req.query.take ? parseInt(req.query.take) : 10;
+  const take = req.query.take ? parseInt(req.query.take) : 0;
   const skip = req.query.skip ? parseInt(req.query.skip) : 0;
   getAllUsers(take, skip).then((users) => res.json(users));
 });
@@ -38,17 +39,19 @@ router.post("/", (req, res, next) => {
   //we need to add the token to the header of the response like this :
 
   addUser(req.body).then((user) => {
+    if (!user) return res.status("400").send("the user already exist");
     //we add the token to the header of the response to make the user login after the registration directly
     const token = jwt.sign(
       //this is the payload
       {
         iduser: user.iduser,
+        email: user.email,
       },
       //this is the private key
       config.get("jwtPrivateKey")
       //the payload and the private key are used to generate the token which is used to authenticate the user
     );
-    res.header("x-auth-token", token).json(user);
+    return res.header("x-auth-token", token).send(user);
   });
   // addUser(req.body).then((user) => res.json(user));
 });
@@ -61,7 +64,14 @@ router.put("/:id", (req, res, next) => {
 
 //DELETE
 
-router.delete("/:id([0-9]+)", (req, res, next) => {
+router.delete("/:id([0-9]+)", auth, (req, res, next) => {
+  if (req.user.iduser != req.params.id)
+    return res
+      .status(401)
+      .send("invalid operation : YOU ARE NOT THE OWNER OF THIS ACOUNT");
+
+  //we need to send an message if the user still have some articles or commentaires
+
   deleteUser(req.params.id).then((user) => res.json(user));
 });
 

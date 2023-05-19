@@ -12,11 +12,20 @@ function getCommentaireById(id) {
   });
 }
 function addCommentaire(commentaire) {
+  // if (req.user.iduser != req.body.iduser)
+  //   return res.status(401).send("operation not allowed");
   return prisma.commentaire.create({
     data: commentaire,
   });
 }
 function updateCommentaire(id, commentaire) {
+  // const comment = prisma.commentaire.findUnique({
+  //   where: {
+  //     idcommentaire: +id,
+  //   },
+  // });
+  // if (req.user.iduser != comment.iduser)
+  //   res.status(401).send("operation not allowed");
   return prisma.commentaire.update({
     where: { idcommentaire: +id },
     data: commentaire,
@@ -24,6 +33,14 @@ function updateCommentaire(id, commentaire) {
 }
 
 function deleteCommentaire(id) {
+  // const comment = prisma.commentaire.findUnique({
+  //   where: {
+  //     idcommentaire: +id,
+  //   },
+  // });
+  // if (req.user.iduser != comment.iduser)
+  //   res.status(401).send("operation not allowed");
+
   return prisma.commentaire.delete({
     where: { idcommentaire: +id },
   });

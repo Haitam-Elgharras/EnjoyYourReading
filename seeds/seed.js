@@ -1,127 +1,96 @@
+//this is to test the database
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-//seed.js is a file that we use to generate fake data to test our application
-//we use faker to generate fake data
-//we use seed.js to generate fake data to test our application
+const { faker } = require("@faker-js/faker");
+/*Dans la racine de votre projet, créer le fichier “seeds/seed.js”. Ce fichier nous permettra lorsqu’il sera exécuté (> node ./seeds/seed.js) de créer en utilisant la bibliothèque “Faker” des données de tests. Vous devez créer :
+10 utilisateurs ayant le rôle “AUTHOR”
+1 utilisateur ayant le rôle “ADMIN”
+10 catégories
+100 articles appartenant à (de 1 à 4 catégories aléatoires) et écrit par l’un des 10 utilisateurs (AUTHOR)
+Pour chaque article, créer de 0 à 20 commentaires)
+Nota : l’exécution du fichier seed.js devra d’abord effacer le contenu de la base de données avant de créer les nouvelles données.
+*/
 
-// const { faker } = require("@faker-js/faker");
-// or
-const faker = require("faker");
+//we need to indicate the role of the user which defined in the prisma like this   role        Role          @default(author)
+//we need to import the Role from the prisma/client
+const { Role } = require("@prisma/client");
 
-//the commande to run the seed is node seeds/seed.js
-
-async function generateUsers() {
+async function seed() {
+  //delete all the data from the database
+  await prisma.commentaire.deleteMany();
+  await prisma.articleCategorie.deleteMany();
+  await prisma.categorie.deleteMany();
+  await prisma.article.deleteMany();
+  await prisma.user.deleteMany();
+  //create 10 users
   for (let i = 0; i < 10; i++) {
     await prisma.user.create({
       data: {
-        name: faker.name.findName(),
+        iduser: i + 1,
+        name: faker.person.fullName(),
         email: faker.internet.email(),
         password: faker.internet.password(),
-        role: "author",
+        role: Role.author,
       },
     });
   }
-
+  //create 1 admin
   await prisma.user.create({
     data: {
-      name: faker.name.findName(),
+      iduser: 11,
+      name: faker.person.fullName(),
       email: faker.internet.email(),
       password: faker.internet.password(),
-      role: "admin",
+      role: Role.admin,
     },
   });
-}
-
-async function generateCategories() {
+  //create 10 categories
   for (let i = 0; i < 10; i++) {
     await prisma.categorie.create({
       data: {
-        nom: faker.lorem.word(),
+        idcategorie: i + 1,
+        nom: faker.person.jobArea(),
       },
     });
   }
-}
-
-async function generateArticles() {
-  const users = await prisma.user.findMany();
-
+  //create 100 articles
   for (let i = 0; i < 100; i++) {
-    const randomUser = faker.random.arrayElement(users);
-
-    const article = await prisma.article.create({
+    await prisma.article.create({
       data: {
-        title: faker.lorem.sentence(),
-        content: faker.lorem.paragraphs(),
-        image: faker.image.imageUrl(),
-        published: faker.random.boolean(),
-        user: {
-          connect: { iduser: randomUser.iduser },
-        },
+        idarticle: i + 1,
+        title: faker.commerce.productName(),
+        content: faker.lorem.paragraph(),
+        image: faker.image.url(),
+        // we need to know from which number the iduser start to have the ability to make a range between the start and the end of the iduser
+        iduser: faker.number.int({ min: 1, max: 10 }),
+
+        // we have a relation many to many between the article and the categorie so we need to add the categorie to the article
         articleCategorie: {
-          createMany: {
-            data: getRandomCategories(),
-          },
+          create: [
+            {
+              categorie: {
+                connect: {
+                  idcategorie: faker.number.int({ min: 1, max: 10 }),
+                },
+              },
+            },
+          ],
         },
       },
     });
-
-    await generateComments(article, randomUser);
   }
-}
-
-async function generateComments(article, user) {
-  const numComments = faker.random.number({ min: 0, max: 20 });
-
-  for (let i = 0; i < numComments; i++) {
+  //create 100 comments
+  for (let i = 0; i < 100; i++) {
     await prisma.commentaire.create({
       data: {
-        email: faker.internet.email(),
         contenu: faker.lorem.paragraph(),
-        article: {
-          connect: { idarticle: article.idarticle },
-        },
-        user: {
-          connect: { iduser: user.iduser },
-        },
+        iduser: faker.number.int({ min: 1, max: 10 }),
+        idarticle: faker.number.int({ min: 1, max: 100 }),
+        email: faker.internet.email(),
       },
     });
   }
 }
-
-function getRandomCategories() {
-  const numCategories = faker.random.number({ min: 1, max: 4 });
-  const categories = [];
-
-  for (let i = 0; i < numCategories; i++) {
-    categories.push({
-      categorie: {
-        connect: { idcategorie: faker.random.number({ min: 1, max: 10 }) },
-      },
-    });
-  }
-
-  return categories;
-}
-
-async function runSeed() {
-  try {
-    await prisma.$connect();
-
-    // Clear existing data from the database
-    await prisma.$executeRaw("DELETE FROM commentaire");
-    await prisma.$executeRaw("DELETE FROM articleCategorie");
-    await prisma.$executeRaw("DELETE FROM categorie");
-    await prisma.$executeRaw("DELETE FROM user");
-
-    await generateUsers();
-    await generateCategories();
-    await generateArticles();
-  } catch (error) {
-    console.error(error);
-    throw error;
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-runSeed();
+seed().catch((e) => {
+  throw e;
+});
