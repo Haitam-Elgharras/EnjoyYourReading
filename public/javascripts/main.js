@@ -125,7 +125,7 @@ function loginToken(e) {
     email: email,
     password: password,
   };
-  fetch("http://localhost:3000/auth", {
+  fetch("/auth", {
     method: "post",
     headers: {
       "Content-Type": "application/json",
@@ -159,7 +159,7 @@ function registerToken(e) {
     email: email,
     password: password,
   };
-  fetch(`http://localhost:3000/users`, {
+  fetch(`/users`, {
     method: "post",
     headers: {
       "Content-Type": "application/json",
@@ -177,7 +177,7 @@ function registerToken(e) {
       const user = parseJwt(localStorage.getItem("token"));
       // console.log(user);
       // if (user.email == email) {
-      //   window.location.href = `http://localhost:3000/users/${user.iduser}`;
+      //   window.location.href = `/users/${user.iduser}`;
       // }
       isAuthentificated(user, email);
     })
@@ -210,7 +210,7 @@ function isAuthentificated(user, email) {
     displayArticles(user);
   } else {
     document.body.innerHTML = "Error 404";
-    fetch(`http://localhost:3000/`);
+    fetch(`/`);
   }
 }
 
@@ -360,24 +360,18 @@ let fetchPosts = async (number) => {
   myPagination.style = "background-color:rgb(32, 178, 170, 0)";
 
   myPagination.innerHTML = "";
-  let posts = await fetch("http://localhost:3000/articles").then(
-    async (response) => {
-      let myData = await response.json();
-      return myData;
-    }
-  );
-  let users = await fetch("http://localhost:3000/users").then(
-    async (response) => {
-      let myData = await response.json();
-      return myData;
-    }
-  );
-  let comments = await fetch("http://localhost:3000/commentaires").then(
-    async (response) => {
-      let myData = await response.json();
-      return myData;
-    }
-  );
+  let posts = await fetch("/articles").then(async (response) => {
+    let myData = await response.json();
+    return myData;
+  });
+  let users = await fetch("/users").then(async (response) => {
+    let myData = await response.json();
+    return myData;
+  });
+  let comments = await fetch("/commentaires").then(async (response) => {
+    let myData = await response.json();
+    return myData;
+  });
   // let i = 0;
   for (let j = number * 5 - 5; j < number * 5; j++) {
     // console.log(j);
