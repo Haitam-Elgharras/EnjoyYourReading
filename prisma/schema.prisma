@@ -3,9 +3,10 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 //if we make any changes we must migrate the changes to the db by running the following command 
 // npx prisma migrate dev --name init
 
@@ -24,12 +25,10 @@ model user {
   //relation between the user and the article as a foriegn key as the user can have many articles so we declare the relation as a one to many
   article     article[]
   commentaire commentaire[]
-//I need to add a function to the user model for generating a token so I can use it in the auth middleware to authenticate the user 
-//I will use the jsonwebtoken package to generate the token
-//I will use the bcryptjs package to hash the password AND THis is the code for the function
-
+  //I need to add a function to the user model for generating a token so I can use it in the auth middleware to authenticate the user 
+  //I will use the jsonwebtoken package to generate the token
+  //I will use the bcryptjs package to hash the password AND THis is the code for the function
 }
-
 
 //the user can be an admin or an author (admin, author)
 //here we define the Role as an enum which means that the role can only be one of the two values
@@ -39,16 +38,16 @@ enum Role {
 }
 
 model article {
-  idarticle Int      @id @default(autoincrement())
-  title     String
-  content   String
-  image     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  published Boolean @default(false)
+  idarticle        Int                @id @default(autoincrement())
+  title            String
+  content          String
+  image            String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  published        Boolean            @default(false)
   //relation between the user and the article as a foriegn key
-  user             user             @relation(fields: [iduser], references: [iduser])
-  iduser          Int
+  user             user               @relation(fields: [iduser], references: [iduser])
+  iduser           Int
   articleCategorie articleCategorie[]
   //relation between the article and the comments
   commentaire      commentaire[]
