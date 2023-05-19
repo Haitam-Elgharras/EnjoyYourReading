@@ -8,7 +8,7 @@ var express = require("express");
 var router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
+//this route is used to login the user
 //the authententication need just the email and the password
 
 router.post("/", async (req, res, next) => {

@@ -143,7 +143,7 @@ function loginToken(e) {
     .then((token) => {
       localStorage.setItem("token", token);
       const user = parseJwt(token);
-      // console.log(user);
+      console.log(user);
       isAuthentificated(user, email);
     })
     .catch((err) => console.log("syntax", err));
@@ -356,19 +356,39 @@ function createPagination(totalPages, page) {
 
 // const myPagination = document.querySelector(".myPagination");
 let fetchPosts = async (number) => {
-  document.body.style = "background-color:rgb(32, 178, 170, 0)";
-  myPagination.style = "background-color:rgb(32, 178, 170, 0)";
+  // document.body.style = "background-color:rgb(32, 178, 170, 0)";
+  // myPagination.style = "background-color:rgb(32, 178, 170, 0)";
+  const token = localStorage.getItem("token");
 
   myPagination.innerHTML = "";
-  let posts = await fetch("/articles").then(async (response) => {
+  //we can send a body with the
+  let posts = await fetch("/articles", {
+    method: "get",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": token,
+    },
+  }).then(async (response) => {
     let myData = await response.json();
     return myData;
   });
-  let users = await fetch("/users").then(async (response) => {
+  let users = await fetch("/users", {
+    method: "get",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": token,
+    },
+  }).then(async (response) => {
     let myData = await response.json();
     return myData;
   });
-  let comments = await fetch("/commentaires").then(async (response) => {
+  let comments = await fetch("/commentaires", {
+    method: "get",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": token,
+    },
+  }).then(async (response) => {
     let myData = await response.json();
     return myData;
   });
@@ -385,7 +405,7 @@ let fetchPosts = async (number) => {
     }
     var mainDivComments = "<div>";
     let allComments = () => {
-      console.log(comments);
+      // console.log(comments);
       for (let i = 0; i < comments.length; i++) {
         if (idarticle == comments[i].idarticle) {
           const name = () => {
