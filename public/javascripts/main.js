@@ -216,6 +216,21 @@ function isAuthentificated(user, email) {
 
 //end of the login function
 
+//start logout function
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/";
+}
+
+window.addEventListener("load", () => {
+  const token = localStorage.getItem("token");
+  if (token != null) {
+    const user = parseJwt(token);
+    displayArticles(user);
+  }
+});
+
 //############################################################################################################
 // start articles home
 //start pagination
@@ -251,8 +266,28 @@ divTwo.classList.add("two");
 const divThree = document.createElement("div");
 divThree.classList.add("three");
 
+const logoutnButton = document.createElement("button");
+logoutnButton.setAttribute("class", "custom-btn btn-3");
+logoutnButton.setAttribute("id", "logout");
+const spanLogout = document.createElement("span");
+spanLogout.textContent = "Logout";
+logoutnButton.appendChild(spanLogout);
+logoutnButton.addEventListener("click", logout);
+
 function displayArticles(user) {
   document.body.innerHTML = "";
+  const logoutDiv = document.createElement("div");
+  logoutDiv.setAttribute("class", "logout");
+  logoutDiv.setAttribute(
+    "style",
+    "display:flex; justify-content: flex-end;width:100vw;position:fixed; top:0; right:0; padding: 10px; background-color:transparent; z-index: 100000; "
+  );
+  logoutnButton.setAttribute(
+    "style",
+    "margin-right: 10px; position:fixed; top:0; right:0; "
+  );
+  logoutDiv.appendChild(logoutnButton);
+  document.body.appendChild(logoutDiv);
 
   // Nest the divs inside the load animation
   load.appendChild(divOne);
@@ -385,7 +420,7 @@ let fetchPosts = async (number) => {
     }
     var mainDivComments = "<div>";
     let allComments = () => {
-      console.log(comments);
+      // console.log(comments);
       for (let i = 0; i < comments.length; i++) {
         if (idarticle == comments[i].idarticle) {
           const name = () => {
@@ -427,8 +462,8 @@ let fetchPosts = async (number) => {
  
     </div>`;
   }
-  myPagination.style = "background-color:rgb(32, 178, 170, 0.3)";
-  document.body.style = "background-color:rgb(32, 178, 170, 0.09)";
+  // myPagination.style = "background-color:rgb(32, 178, 170, 0.3)";
+  // document.body.style = "background-color:rgb(32, 178, 170, 0.09)";
 };
 
 const hidAnimation = () => {

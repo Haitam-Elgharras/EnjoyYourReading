@@ -45,7 +45,7 @@ router.put("/:id([0-9]+)", auth, (req, res, next) => {
   const Article = prisma.article.findUnique({
     where: { idarticle: +req.params.id },
   });
-  console.log(Article.iduser, req.user.iduser);
+  // console.log(Article.iduser, req.user.iduser);
 
   //a user doesn't have the abilty to post an article with the id of another user
   if (Article.iduser != req.user.iduser)

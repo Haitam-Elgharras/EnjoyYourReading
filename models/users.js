@@ -52,37 +52,19 @@ function updateUser(id, user) {
 }
 
 async function deleteUser(id) {
-  //we need to verifiy that the user doesnt have any articles or comments before deleting him
-  //I need to give him the choice to delete all his articles and comments before deleting his account, as follow: i need to add a button yes/no to delete all the article and comments before deleting the account
-  const countArticles = await prisma.article.count({
-    where: {
-      iduser: +id,
+  const user = await prisma.user.findUnique({
+    where: { iduser: +id },
+    include: {
+      article: true,
+      commentaire: true,
     },
   });
-  const countComments = await prisma.commentaire.count({
-    where: {
-      iduser: +id,
-    },
-  });
-  console.log(countArticles, countComments);
-  if (countArticles > 0 || countComments > 0) {
-    //we need to give him the choice to delete all his articles and comments before deleting his account
 
-    //we need to delete all his articles and comments
-    await prisma.commentaire.deleteMany({
-      where: {
-        iduser: +id,
-      },
-    });
-
-    await prisma.article.deleteMany({
-      where: {
-        iduser: +id,
-      },
-    });
+  if (user == null) {
+    return 0;
   }
-
-  return prisma.user.delete({
+  // Delete the user directly
+  return await prisma.user.delete({
     where: { iduser: +id },
   });
 }

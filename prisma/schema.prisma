@@ -3,88 +3,62 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL")
+  shadowDatabaseUrl = env("POSTGRES_PRISMA_URL")
 }
-//if we make any changes we must migrate the changes to the db by running the following command 
-// npx prisma migrate dev --name init
 
-//schema for the Blog database using mysql
-
-//if a field does not have a default value or has the @unique attribute, it is considered obligatory when creating a new user.
 model user {
   iduser      Int           @id @default(autoincrement())
   name        String
   email       String        @unique
-  password    String? //? means that the field is optional
+  password    String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-  //the user can be an admin or an author (admin, author)
   role        Role          @default(author)
-  //relation between the user and the article as a foriegn key as the user can have many articles so we declare the relation as a one to many
   article     article[]
   commentaire commentaire[]
-//I need to add a function to the user model for generating a token so I can use it in the auth middleware to authenticate the user 
-//I will use the jsonwebtoken package to generate the token
-//I will use the bcryptjs package to hash the password AND THis is the code for the function
-
-}
-
-
-//the user can be an admin or an author (admin, author)
-//here we define the Role as an enum which means that the role can only be one of the two values
-enum Role {
-  admin
-  author
 }
 
 model article {
-  idarticle Int      @id @default(autoincrement())
-  title     String
-  content   String
-  image     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  published Boolean @default(false)
-  //relation between the user and the article as a foriegn key
-  user             user             @relation(fields: [iduser], references: [iduser])
-  iduser          Int
+  idarticle        Int                @id @default(autoincrement())
+  title            String
+  content          String
+  image            String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  published        Boolean            @default(false)
+  iduser           Int
+  user             user               @relation(fields: [iduser], references: [iduser], onDelete: Cascade)
   articleCategorie articleCategorie[]
-  //relation between the article and the comments
   commentaire      commentaire[]
 }
 
-// Categorie
-// ● nom
 model categorie {
   idcategorie      Int                @id @default(autoincrement())
   nom              String
-  //this is a many to many relationship between the article and the category
   articleCategorie articleCategorie[]
-  // when we send the http request to post a categorie it must 
 }
 
 model articleCategorie {
   idarticleCategorie Int       @id @default(autoincrement())
-  article            article   @relation(fields: [idarticle], references: [idarticle])
   idarticle          Int
-  categorie          categorie @relation(fields: [idcategorie], references: [idcategorie])
   idcategorie        Int
+  article            article   @relation(fields: [idarticle], references: [idarticle], onDelete: Cascade)
+  categorie          categorie @relation(fields: [idcategorie], references: [idcategorie], onDelete: Cascade)
 }
 
-//commentaire
 model commentaire {
   idcommentaire Int     @id @default(autoincrement())
   email         String
   contenu       String
-  //relation between the article and the comments
-  article       article @relation(fields: [idarticle], references: [idarticle])
   idarticle     Int
-  //relation between the user and the comments
-  user          user    @relation(fields: [iduser], references: [iduser])
   iduser        Int
+  article       article @relation(fields: [idarticle], references: [idarticle], onDelete: Cascade)
+  user          user    @relation(fields: [iduser], references: [iduser], onDelete: Cascade)
 }
 
-// now we will send this changes to the db by running the following command 
-// npx prisma migrate dev --name init
-//if we want to add some users or articles we can do it by using the npx prisma studio which will open a new tab in the browser and we can add the data we want
+enum Role {
+  admin
+  author
+}

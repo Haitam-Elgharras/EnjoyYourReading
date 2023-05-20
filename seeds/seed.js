@@ -26,7 +26,6 @@ async function seed() {
   for (let i = 0; i < 10; i++) {
     await prisma.user.create({
       data: {
-        iduser: i + 1,
         name: faker.person.fullName(),
         email: faker.internet.email(),
         password: faker.internet.password(),
@@ -37,7 +36,6 @@ async function seed() {
   //create 1 admin
   await prisma.user.create({
     data: {
-      iduser: 11,
       name: faker.person.fullName(),
       email: faker.internet.email(),
       password: faker.internet.password(),

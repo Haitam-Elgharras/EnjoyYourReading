@@ -224,11 +224,11 @@ body {
   margin-top: 10px;
 }
 .login-box a:hover {
-  background: #03e9f4;
+  /* background: #03e9f4; */
   color: #fff;
   border-radius: 5px;
-  /* box-shadow: 0 0 5px #03e9f4, 0 0 15px #03e9f4, 0 0 25px #03e9f4,
-    0 0 50px #03e9f4; */
+  box-shadow: 0 0 5px #03e9f4, 0 0 15px #03e9f4, 0 0 25px #03e9f4,
+    0 0 50px #03e9f4;
 }
 
 .login-box a span {
@@ -351,7 +351,8 @@ ul {
 .pagination ul {
   display: flex;
   width: 468px;
-  background-color: rgb(32, 178, 170, 0.9);
+  /* background-color: rgb(32, 178, 170, 0.9); */
+  background-color: rgb(3, 233, 244, 0.7);
   padding: 8px;
   border-radius: 50px;
   margin: 0 auto;
@@ -390,6 +391,7 @@ ul {
 .pagination li.btn:hover {
   background-color: rgb(255, 255, 255);
   color: #20b2aa;
+  /* rgb(33, 54, 78) */
 }
 /* end pagination */
 
@@ -405,7 +407,7 @@ ul {
   height: calc(100vh + 50px);
   justify-content: center;
   align-items: center;
-  background-color: #fff;
+  /* background-color: #fff; */
   overflow: hidden;
 }
 .load {

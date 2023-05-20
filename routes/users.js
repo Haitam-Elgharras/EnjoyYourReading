@@ -72,7 +72,10 @@ router.delete("/:id([0-9]+)", auth, (req, res, next) => {
 
   //we need to send an message if the user still have some articles or commentaires
 
-  deleteUser(req.params.id).then((user) => res.json(user));
+  deleteUser(req.params.id).then((user) => {
+    if (user == 0) return res.status(404).send("user not found");
+    return res.json(user);
+  });
 });
 
 module.exports = router;
