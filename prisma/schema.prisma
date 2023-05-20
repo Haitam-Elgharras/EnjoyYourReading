@@ -3,15 +3,14 @@ generator client {
 }
 
 // datasource db {
-//   // provider = "postgresql"
 //   provider = "mysql"
 //   url      = env("DATABASE_URL")
-// }
+// }  //this is the default datasource that prisma creates for us when we run the command npx prisma init
 datasource db {
   provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+  url = env("DATABASE_URL") // uses connection pooling
+  // directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  shadowDatabaseUrl = env("DATABASE_URL") // used for migrations
 }
 //if we make any changes we must migrate the changes to the db by running the following command 
 // npx prisma migrate dev --name init
@@ -78,7 +77,6 @@ model articleCategorie {
   categorie          categorie @relation(fields: [idcategorie], references: [idcategorie])
   idcategorie        Int
 }
-
 //commentaire
 model commentaire {
   idcommentaire Int     @id @default(autoincrement())

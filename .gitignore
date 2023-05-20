@@ -1,6 +1,7 @@
 node_modules
 # Keep environment variables out of version control
 .env
+.env.development.local
 # Ignore log files
 node_modules/
 .DS_Store
@@ -12,4 +13,4 @@ logs/
 .idea/
 tests/
 Readme.js
-
+.vercel

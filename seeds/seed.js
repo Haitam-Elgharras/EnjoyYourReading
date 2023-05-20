@@ -14,6 +14,7 @@ Nota : l’exécution du fichier seed.js devra d’abord effacer le contenu de l
 //we need to indicate the role of the user which defined in the prisma like this   role        Role          @default(author)
 //we need to import the Role from the prisma/client
 const { Role } = require("@prisma/client");
+console.log("test1");
 
 async function seed() {
   //delete all the data from the database
@@ -22,6 +23,7 @@ async function seed() {
   await prisma.categorie.deleteMany();
   await prisma.article.deleteMany();
   await prisma.user.deleteMany();
+  console.log("test2");
   //create 10 users
   for (let i = 0; i < 10; i++) {
     await prisma.user.create({
@@ -34,6 +36,8 @@ async function seed() {
       },
     });
   }
+  console.log("test3");
+
   //create 1 admin
   await prisma.user.create({
     data: {
@@ -44,6 +48,8 @@ async function seed() {
       role: Role.admin,
     },
   });
+  console.log("test4");
+
   //create 10 categories
   for (let i = 0; i < 10; i++) {
     await prisma.categorie.create({
@@ -53,44 +59,52 @@ async function seed() {
       },
     });
   }
+  console.log("test5");
+
   //create 100 articles
   for (let i = 0; i < 100; i++) {
-    await prisma.article.create({
-      data: {
-        idarticle: i + 1,
-        title: faker.commerce.productName(),
-        content: faker.lorem.paragraph(),
-        image: faker.image.url(),
-        // we need to know from which number the iduser start to have the ability to make a range between the start and the end of the iduser
-        iduser: faker.number.int({ min: 1, max: 10 }),
-
-        // we have a relation many to many between the article and the categorie so we need to add the categorie to the article
-        articleCategorie: {
-          create: [
-            {
-              categorie: {
-                connect: {
-                  idcategorie: faker.number.int({ min: 1, max: 10 }),
-                },
+    let article = {
+      idarticle: i + 1,
+      title: faker.commerce.productName(),
+      content: faker.lorem.paragraph(),
+      image: faker.image.url(),
+      // we need to know from which number the iduser start to have the ability to make a range between the start and the end of the iduser
+      iduser: faker.number.int({ min: 1, max: 10 }),
+      // we have a relation many to many between the article and the categorie so we need to add the categorie to the article
+      articleCategorie: {
+        create: [
+          {
+            categorie: {
+              connect: {
+                idcategorie: faker.number.int({ min: 1, max: 10 }),
               },
             },
-          ],
-        },
+          },
+        ],
       },
+    };
+    await prisma.article.create({
+      data: article,
     });
   }
+  console.log("test6");
+
   //create 100 comments
   for (let i = 0; i < 100; i++) {
+    let commentaire = {
+      contenu: faker.lorem.paragraph(),
+      iduser: faker.number.int({ min: 1, max: 10 }),
+      idarticle: faker.number.int({ min: 1, max: 100 }),
+      email: faker.internet.email(),
+    };
     await prisma.commentaire.create({
-      data: {
-        contenu: faker.lorem.paragraph(),
-        iduser: faker.number.int({ min: 1, max: 10 }),
-        idarticle: faker.number.int({ min: 1, max: 100 }),
-        email: faker.internet.email(),
-      },
+      data: commentaire,
     });
   }
+  console.log("test7");
 }
+console.log("test8");
+
 seed().catch((e) => {
   throw e;
 });

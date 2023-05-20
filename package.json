@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "@prisma/client": "^4.14.1",
+    "@vercel/analytics": "^1.0.1",
+    "@vercel/postgres": "^0.3.0",
     "config": "^3.3.9",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
