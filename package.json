@@ -1,9 +1,13 @@
 {
   "name": "blogproject",
   "version": "0.0.0",
+  "main": "app.js",
+  "engines": {
+    "node": "14.x"
+  },
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www",
+    "start": "node app.js",
     "seed": "node ./seeds/seed.js"
   },
   "dependencies": {
