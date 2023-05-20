@@ -12,3 +12,5 @@ logs/
 .idea/
 tests/
 Readme.js
+.vercel
+.env.development.local

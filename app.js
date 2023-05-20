@@ -31,6 +31,7 @@ app.use("/users", usersRouter);
 app.use("/articles", articlesRouter);
 app.use("/categories", categoriesRouter);
 app.use("/commentaires", commentairesRouter);
+
 app.use("/auth", authRouter);
 
 module.exports = app;
