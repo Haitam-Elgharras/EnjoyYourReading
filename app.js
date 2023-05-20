@@ -26,11 +26,11 @@ app.use(cookieParser());
 // static midleware give us the ability to use static files like css, js, images
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/articles", articlesRouter);
 app.use("/categories", categoriesRouter);
 app.use("/commentaires", commentairesRouter);
 app.use("/auth", authRouter);
+app.use("/", indexRouter);
 
 module.exports = app;
