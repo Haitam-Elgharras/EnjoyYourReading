@@ -144,8 +144,8 @@ function loginToken(e) {
     .then((token) => {
       localStorage.setItem("token", token);
       const user = parseJwt(token);
-      // console.log(user);
-      isAuthentificated(user, email);
+      if (user) isAuthentificated(user, email);
+      else window.location.href = "/";
     })
     .catch((err) => console.log("syntax", err));
 }

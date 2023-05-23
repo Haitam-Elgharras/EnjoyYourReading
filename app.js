@@ -4,7 +4,6 @@ const config = require("config");
 // Load environment variables from .env file
 dotenv.config();
 // Set the NODE_ENV variable if not already set
-process.env.NODE_ENV = process.env.NODE_ENV || "development";
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
@@ -37,7 +36,7 @@ app.use("/users", usersRouter);
 app.use("/articles", articlesRouter);
 app.use("/categories", categoriesRouter);
 app.use("/commentaires", commentairesRouter);
-
 app.use("/auth", authRouter);
-
+process.env.NODE_ENV = process.env.NODE_ENV || "development";
+// console.log(process.env.NODE_ENV);
 module.exports = app;
