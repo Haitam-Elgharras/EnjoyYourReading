@@ -5,7 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 //after we need to set the jwtPrivateKey in the terminal by typing: set blog_jwtPrivateKey=yourPrivateKey
 //or we can set it in the config\custom-environment-variables.json file by typing: "blog_jwtPrivateKey":"yourPrivateKey"
-if (!config.get("jwtPrivateKey")) {
+if (!process.env.jwtPrivateKey) {
   console.error("FATAL ERROR: jwtPrivateKey is not defined.");
   process.exit(1);
 }

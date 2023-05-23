@@ -48,7 +48,7 @@ router.post("/", (req, res, next) => {
         email: user.email,
       },
       //this is the private key
-      config.get("jwtPrivateKey")
+      process.env.jwtPrivateKey
       //the payload and the private key are used to generate the token which is used to authenticate the user
     );
     return res.header("x-auth-token", token).send(user);
