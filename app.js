@@ -1,14 +1,10 @@
-const dotenv = require("dotenv");
-dotenv.config();
-const config = require("config");
-
-// Load environment variables from .env file
-//npm run node-pg-migrate up
-// Set the NODE_ENV variable if not already set
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const dotenv = require("dotenv");
+dotenv.config();
+const config = require("config");
 //after we need to set the jwtPrivateKey in the terminal by typing: set blog_jwtPrivateKey=yourPrivateKey
 //or we can set it in the config\custom-environment-variables.json file by typing: "blog_jwtPrivateKey":"yourPrivateKey"
 if (!process.env.jwtPrivateKey) {
