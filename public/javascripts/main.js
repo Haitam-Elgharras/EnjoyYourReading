@@ -139,13 +139,14 @@ function loginToken(e) {
         //will be executed if the email or the password is wrong
         e.target.submit();
       }
-      return res.headers.get("x-auth-token");
+      return res;
     })
-    .then((token) => {
+    .then((res) => {
+      const token = res.headers.get("x-auth-token");
       localStorage.setItem("token", token);
       const user = parseJwt(token);
-      if (user) isAuthentificated(user, email);
-      else window.location.href = "/";
+      if (user != null) isAuthentificated(user, email);
+      else res.status(400).send("the user is not found");
     })
     .catch((err) => console.log("syntax", err));
 }
