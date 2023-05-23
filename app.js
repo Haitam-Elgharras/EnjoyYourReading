@@ -5,7 +5,6 @@ const config = require("config");
 dotenv.config();
 // Set the NODE_ENV variable if not already set
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
-
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
