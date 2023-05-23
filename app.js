@@ -1,5 +1,11 @@
+const dotenv = require("dotenv");
 const config = require("config");
-require("dotenv").config();
+
+// Load environment variables from .env file
+dotenv.config();
+// Set the NODE_ENV variable if not already set
+process.env.NODE_ENV = process.env.NODE_ENV || "development";
+
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");

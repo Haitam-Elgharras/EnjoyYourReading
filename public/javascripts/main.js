@@ -271,6 +271,7 @@ divThree.classList.add("three");
 const logoutnButton = document.createElement("button");
 logoutnButton.setAttribute("class", "custom-btn btn-3");
 logoutnButton.setAttribute("id", "logout");
+logoutnButton.addEventListener("click", logout);
 const spanLogout = document.createElement("span");
 spanLogout.textContent = "Logout";
 logoutnButton.appendChild(spanLogout);
