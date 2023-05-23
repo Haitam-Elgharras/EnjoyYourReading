@@ -1,8 +1,9 @@
 const dotenv = require("dotenv");
+dotenv.config();
 const config = require("config");
 
 // Load environment variables from .env file
-dotenv.config();
+
 // Set the NODE_ENV variable if not already set
 var express = require("express");
 var path = require("path");

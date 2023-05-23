@@ -146,7 +146,6 @@ function loginToken(e) {
       localStorage.setItem("token", token);
       const user = parseJwt(token);
       if (user != null) isAuthentificated(user, email);
-      else res.status(400).send("the user is not found");
     })
     .catch((err) => console.log("syntax", err));
 }

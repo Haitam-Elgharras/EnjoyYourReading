@@ -2,6 +2,8 @@
 
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const dotenv = require("dotenv");
+dotenv.config();
 
 function auth(req, res, next) {
   //we get the token from the header of the request

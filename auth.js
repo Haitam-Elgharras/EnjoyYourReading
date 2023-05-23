@@ -8,6 +8,8 @@ var express = require("express");
 var router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const dotenv = require("dotenv");
+dotenv.config();
 
 //the authententication need just the email and the password
 

@@ -2,6 +2,8 @@ var express = require("express");
 var router = express.Router();
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const dotenv = require("dotenv");
+dotenv.config();
 const auth = require("../middleware/auth");
 const {
   getAllUsers,
