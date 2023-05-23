@@ -3,7 +3,7 @@ dotenv.config();
 const config = require("config");
 
 // Load environment variables from .env file
-
+//npm run node-pg-migrate up
 // Set the NODE_ENV variable if not already set
 var express = require("express");
 var path = require("path");

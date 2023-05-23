@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "set NODE_ENV=development&& nodemon app.js",
-    "start-prod": "set NODE_ENV=production&& nodemon app.js"
+    "start": "set NODE_ENV=development&& nodemon index.js",
+    "start-prod": "set NODE_ENV=production&& nodemon index.js"
   },
   "dependencies": {
     "@prisma/client": "^4.14.1",
