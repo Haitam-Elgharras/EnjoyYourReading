@@ -34,6 +34,7 @@ spanLogin.textContent = "Login";
 loginButton.appendChild(spanLogin);
 loginDiv.appendChild(loginButton);
 container.appendChild(loginDiv);
+container.style.setProperty("height", "90vh");
 
 window.onload = () => {
   document.body.appendChild(container);
@@ -223,7 +224,8 @@ function logout() {
   window.location.href = "/";
 }
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
+  firstTime = true;
   const token = localStorage.getItem("token");
   if (token != null) {
     const user = parseJwt(token);
@@ -272,10 +274,11 @@ logoutnButton.setAttribute("id", "logout");
 const spanLogout = document.createElement("span");
 spanLogout.textContent = "Logout";
 logoutnButton.appendChild(spanLogout);
-logoutnButton.addEventListener("click", logout);
+// logoutnButton.addEventListener("click", logout);
 
-function displayArticles(user) {
+async function displayArticles(user) {
   document.body.innerHTML = "";
+  navbar();
   const logoutDiv = document.createElement("div");
   logoutDiv.setAttribute("class", "logout");
   logoutDiv.setAttribute(
@@ -286,8 +289,8 @@ function displayArticles(user) {
     "style",
     "margin-right: 10px; position:fixed; top:0; right:0; "
   );
-  logoutDiv.appendChild(logoutnButton);
-  document.body.appendChild(logoutDiv);
+  // logoutDiv.appendChild(logoutnButton);
+  document.body.appendChild(logoutnButton);
 
   // Nest the divs inside the load animation
   load.appendChild(divOne);
@@ -298,24 +301,26 @@ function displayArticles(user) {
   loading.appendChild(load);
 
   // Nest the pagination elements inside the articles container
+  const el = addArticle();
+  document.body.appendChild(el[0]);
+  document.body.appendChild(el[1]);
   articlesContainer.appendChild(loading);
   articlesContainer.appendChild(pagination);
   articlesContainer.appendChild(myPagination);
   document.body.appendChild(articlesContainer);
-  createPagination(totalPages, page);
+  await createPagination(totalPages, page);
   fetchPosts(page);
   order();
 }
 const element = document.createElement("ul");
 
 //calling function with passing parameters and adding inside element which is ul tag
-function createPagination(totalPages, page) {
-  const there = async () => {
-    loading.style.setProperty("display", "flex");
-    await fetchPosts(page);
-    loading.style.setProperty("display", "none");
-  };
-  there();
+async function createPagination(totalPages, page) {
+  loading.style.setProperty("display", "flex");
+  await fetchPosts(page);
+  loading.style.setProperty("display", "none");
+
+  // await there();
   let liTag = "";
   let active;
   let beforePage = page - 1;
@@ -388,25 +393,39 @@ function createPagination(totalPages, page) {
   return liTag; //reurn the li tag
 }
 //end pagination
-
+var posts, users, comments;
 // const myPagination = document.querySelector(".myPagination");
 let fetchPosts = async (number) => {
+  myPagination.innerHTML = "";
   document.body.style = "background-color:rgb(32, 178, 170, 0)";
   myPagination.style = "background-color:rgb(32, 178, 170, 0)";
-
-  myPagination.innerHTML = "";
-  let posts = await fetch("/articles").then(async (response) => {
-    let myData = await response.json();
-    return myData;
-  });
-  let users = await fetch("/users").then(async (response) => {
-    let myData = await response.json();
-    return myData;
-  });
-  let comments = await fetch("/commentaires").then(async (response) => {
-    let myData = await response.json();
-    return myData;
-  });
+  if (firstTime == true && localStorage.getItem("token") != null) {
+    firstTime = false;
+    comments = await fetch("/commentaires").then(async (response) => {
+      let myData = await response.json();
+      return myData;
+    });
+    users = await fetch("/users").then(async (response) => {
+      let myData = await response.json();
+      return myData;
+    });
+    posts = await fetch("/articles").then(async (response) => {
+      let myData = await response.json();
+      return myData;
+    });
+  }
+  // let posts = await fetch("/articles").then(async (response) => {
+  //   let myData = await response.json();
+  //   return myData;
+  // });
+  // let users = await fetch("/users").then(async (response) => {
+  //   let myData = await response.json();
+  //   return myData;
+  // });
+  // let comments = await fetch("/commentaires").then(async (response) => {
+  //   let myData = await response.json();
+  //   return myData;
+  // });
   // let i = 0;
   for (let j = number * 5 - 5; j < number * 5; j++) {
     // console.log(j);
@@ -419,7 +438,7 @@ let fetchPosts = async (number) => {
       }
     }
     var mainDivComments = "<div>";
-    let allComments = () => {
+    let allComments = async () => {
       // console.log(comments);
       for (let i = 0; i < comments.length; i++) {
         if (idarticle == comments[i].idarticle) {
@@ -451,11 +470,11 @@ let fetchPosts = async (number) => {
       <p class="card-text">${content}</p>
     </div>
     <p>
-    <button class="btn btn-primary" type="button" style="margin:0 auto ; display : block; width:fit-content ; background-color:rgb(32, 178, 170)" data-bs-toggle="collapse" data-bs-target="#collapseExample${iduser}" aria-expanded="false" aria-controls="collapseExample">
+    <button class="btn btn-primary" type="button" style="margin:0 auto ; display : block; width:fit-content ; background-color:rgb(32, 178, 170)" data-bs-toggle="collapse" data-bs-target="#collapseExample${post.idarticle}" aria-expanded="false" aria-controls="collapseExample">
     show comments
     </button>
     </p>
-    <div class="collapse" id="collapseExample${iduser}">
+    <div class="collapse" id="collapseExample${post.idarticle}">
       <div class="card card-body">
     ${mainDivComments}
       </div> </div>
@@ -478,3 +497,112 @@ const order = async () => {
 };
 
 //end articles home
+
+//navbar#############################
+
+function navbar() {
+  // Create the navBar element
+  const navBar = document.createElement("div");
+  navBar.classList.add("navBar");
+  navBar.style = "margin-top:10px";
+
+  // div contain the heading and a slogan
+  const divSlogan = document.createElement("div");
+  divSlogan.style =
+    "display: flex; flex-direction: column; margin-left: 20px; justify-content: center; align-items: center;";
+  const slogan = document.createElement("span");
+  slogan.textContent = "Enjoy Your Reading";
+  slogan.style = "font-size: 12px; color: #fff;";
+  // Create the heading element
+  // const heading = document.createElement("h2");
+  // heading.textContent = "Blog";
+  const img = document.createElement("img");
+  img.setAttribute("src", "../images/logo.png");
+  img.setAttribute("width", "50px");
+
+  // Append the heading and slogan elements to the div element
+  divSlogan.appendChild(img);
+  divSlogan.appendChild(slogan);
+
+  // Create the section element
+  const section = document.createElement("section");
+
+  // Create the search input element
+  const searchInput = document.createElement("input");
+  searchInput.setAttribute("type", "search");
+  searchInput.setAttribute("placeholder", "search");
+  const i = document.createElement("i");
+  //<i class="fa-solid fa-bars"></i>
+  i.setAttribute("class", "fa-solid fa-magnifying-glass");
+  i.style = "font-size: 20px; color: #fff; position: absolute; right: 20px";
+
+  // Create the profile image element
+  const profileImage = document.createElement("img");
+  // profileImage.setAttribute("src", "../images/profile.png");
+  profileImage.classList.add("profile");
+
+  // Append the search input and profile image elements to the section element
+  section.appendChild(searchInput);
+  section.appendChild(profileImage);
+  section.appendChild(i);
+
+  // Append the heading and section elements to the navBar element
+  navBar.appendChild(divSlogan);
+  navBar.appendChild(section);
+  document.body.appendChild(navBar);
+}
+//we need to execute the function if the current page!= index.html
+if (window.location.href != "/") {
+  navbar();
+}
+
+//add article ###############
+
+function addArticle() {
+  // Create the addPostInput element
+  const addArticleInput = document.createElement("div");
+  addArticleInput.classList.add("addArticleInput");
+
+  // Create the section element
+  const section = document.createElement("section");
+
+  // Create the profile image element
+  const profileImage = document.createElement("img");
+  profileImage.setAttribute("src", "images/proFile.png");
+  profileImage.setAttribute("width", "30px");
+  profileImage.classList.add("userProfileImage");
+
+  // Create the input element
+  const input = document.createElement("input");
+  input.setAttribute("id", "textInput");
+  input.setAttribute("placeholder", "write something here");
+  input.setAttribute("type", "text");
+  input.setAttribute("maxlength", "80");
+
+  //           <i class="fa-solid fa-magnifying-glass"></i>
+  const i = document.createElement("i");
+  i.setAttribute("class", "fa-solid fa-magnifying-glass");
+  i.style =
+    "font-size: 20px; color: #fff; position: absolute; right: 20px;font-weight: 900;";
+  input.appendChild(i);
+
+  // Append the profile image and input elements to the section element
+  section.appendChild(profileImage);
+  section.appendChild(input);
+
+  // Create the POST button
+  const articleAddButton = document.createElement("button");
+  articleAddButton.classList.add("articleAddBtn");
+  articleAddButton.setAttribute("type", "submit");
+  articleAddButton.textContent = "Share";
+
+  // Append the section and postButton elements to the addPostInput element
+  addArticleInput.appendChild(section);
+  addArticleInput.appendChild(articleAddButton);
+
+  // Create the Posts element
+  const articlesElement = document.createElement("div");
+  articlesElement.setAttribute("id", "Posts");
+  articlesElement.classList.add("Posts");
+  return [addArticleInput, articlesElement];
+}
