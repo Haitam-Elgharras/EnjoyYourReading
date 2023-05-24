@@ -378,7 +378,7 @@ ul {
   margin: 0 3px;
   transition: all 0.3s ease;
 }
-.pagination ul li.btn {
+.pagination ul li.btnp {
   padding: 0 20px;
 }
 .pagination ul li.prev {
@@ -394,7 +394,7 @@ ul {
 }
 .pagination li.active,
 .pagination li.numb:hover,
-.pagination li.btn:hover {
+.pagination li.btnp:hover {
   background-color: rgb(255, 255, 255);
   color: #20b2aa;
   /* rgb(33, 54, 78) */
