@@ -62,7 +62,7 @@ function registerForm(e) {
       <label for="password">Password:</label>
       </div>
     
-      <a href="#">
+      <a href="#" id="submit-animation">
       <span></span>
       <span></span>
       <span></span>
@@ -74,8 +74,13 @@ function registerForm(e) {
   registerDiv.appendChild(form);
   container.appendChild(registerDiv);
   document.body.appendChild(container);
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    //loading animation
+    const spans = document.querySelectorAll("#submit-animation span");
+    spans.forEach((span) => span.classList.add("active"));
+    //
     registerToken(e);
   });
 }
@@ -97,7 +102,7 @@ function loginForm() {
       <input type="password" id="loginPassword" name="password"required />
       <label for="password">Password:</label>
       </div>
-      <a href="#">
+      <a href="#" id="submit-animation">
       <span></span>
       <span></span>
       <span></span>
@@ -111,8 +116,13 @@ function loginForm() {
   loginDiv.appendChild(form);
   loginDiv.classList.add("login-box");
   container.appendChild(loginDiv);
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    //loading animation
+    const spans = document.querySelectorAll("#submit-animation span");
+    spans.forEach((span) => span.classList.add("active"));
+    //
     loginToken(e);
   });
 }
@@ -187,7 +197,6 @@ function registerToken(e) {
 
 //decode the token
 function parseJwt(token) {
-  if (token == null) return null;
   var base64Url = token.split(".")[1];
   var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
   var jsonPayload = decodeURIComponent(
@@ -221,14 +230,15 @@ function isAuthentificated(user, email) {
 //start logout function
 
 function logout() {
-  localStorage.removeItem("token");
+  const token = localStorage.removeItem("token");
   window.location.href = "/";
 }
 
 window.addEventListener("load", async () => {
   firstTime = true;
   const token = localStorage.getItem("token");
-  if (token != null) {
+  // token == null ? console.log("no token") : console.log("token1", token);
+  if (token != null && token != "null") {
     const user = parseJwt(token);
     displayArticles(user);
   }
@@ -395,6 +405,150 @@ async function createPagination(totalPages, page) {
   return liTag; //reurn the li tag
 }
 //end pagination
+
+//addcommentForm
+async function addCommentForm(idarticle) {
+  const commentForm = document.createElement("form");
+  commentForm.setAttribute("class", `commentForm${idarticle}`);
+  commentForm.setAttribute("id", "commentForm");
+  commentForm.setAttribute("method", "POST");
+  commentForm.setAttribute("action", "/commentaires");
+  commentForm.setAttribute("enctype", "multipart/form-data");
+  commentForm.setAttribute(
+    "style",
+    "display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 20px; margin-bottom: 20px;"
+  );
+  const emailInput = document.createElement("input");
+  emailInput.setAttribute("type", "email");
+  emailInput.setAttribute("name", "email");
+  emailInput.setAttribute("id", "emailInput");
+  emailInput.setAttribute("placeholder", "Email");
+  emailInput.setAttribute(
+    "style",
+    "width: 50%; border-radius: 5px; border: 1px solid black; margin-bottom: 10px; outline: none:padding: 10px"
+  );
+  //make the input disabled
+  emailInput.setAttribute("disabled", "disabled");
+  const commentInput = document.createElement("textarea");
+  commentInput.setAttribute("name", "comment");
+  commentInput.setAttribute("id", "commentInput");
+  commentInput.setAttribute("placeholder", "Commentaire");
+  commentInput.setAttribute("name", "comment");
+  commentInput.setAttribute("rows", "6");
+
+  commentInput.setAttribute(
+    "style",
+    "width: 50%; border-radius: 5px; border: 1px solid black; margin-bottom: 10px; outline: none:padding: 10px;"
+  );
+  const commentSubmit = document.createElement("input");
+  commentSubmit.setAttribute("type", "submit");
+  commentSubmit.setAttribute("name", "submit");
+  commentSubmit.setAttribute("id", "submitComment");
+  commentSubmit.addEventListener("click", (e) => {
+    e.preventDefault();
+  });
+  commentSubmit.setAttribute("class", "submitComment");
+  commentSubmit.setAttribute("onclick", `fetchComment(${idarticle})`);
+  commentSubmit.setAttribute("value", "Commenter");
+  commentSubmit.setAttribute(
+    "style",
+    "width: 50%; height: 30px; border-radius: 5px; border: 1px solid black; margin-bottom: 10px;outline: none !important; background-color: rgb(32, 178, 170); color: white;"
+  );
+  //fetch to get the email of the user
+  const token = localStorage.getItem("token");
+  //we can decode the token to get the email of the user
+  const decoded = parseJwt(token);
+  emailInput.value = decoded.email;
+  const addcommentButon = document.querySelector(
+    `.addcommentButon${idarticle}`
+  );
+  addcommentButon.style.display = "none";
+  commentForm.appendChild(emailInput);
+  commentForm.appendChild(commentInput);
+  commentForm.appendChild(commentSubmit);
+  const mainDivComments = document.querySelector(
+    ".mainDivComments" + idarticle
+  );
+  // console.log(mainDivComments);
+  // console.log(mainDivComments);
+  // console.log(commentForm);
+  mainDivComments.appendChild(commentForm);
+}
+
+fetchComment = async (idarticle) => {
+  const commentForm = document.querySelector(`.commentForm${idarticle}`);
+  const commentInput = document.querySelector("#commentInput");
+  const emailInput = document.querySelector("#emailInput");
+  const email = emailInput.value;
+  const comment = commentInput.value;
+  const token = localStorage.getItem("token");
+  const decoded = parseJwt(token);
+  const iduser = decoded.iduser;
+  //can't get the name from the decoded ??
+  //fetch to get the name of the user
+  const response = await fetch(`/users/${iduser}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": token,
+    },
+  });
+  const data = await response.json();
+  const name = data.name;
+
+  // console.log(+iduser);
+  // console.log(decoded);
+  await fetch("/commentaires", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": token,
+    },
+    body: JSON.stringify({
+      email: email,
+      contenu: comment,
+      idarticle: idarticle,
+      iduser: iduser,
+    }),
+  })
+    .then((response) => {
+      if (response.status == 200) {
+        return response.json();
+      } else {
+        throw new Error("Something went wrong on api server!");
+      }
+    })
+    .then((response) => {
+      //we get the comment here so we need to add it to the comments array like this :
+      comments.push(response);
+      // let's start
+      const commentOwner = document.createElement("h4");
+      // commentOwner.setAttribute("style", "text-align:center");
+      commentOwner.innerHTML = name;
+      const p = document.createElement("p");
+      p.setAttribute(
+        "style",
+        "text-align:center ; border-bottom:1px solid rgb(32, 178, 170, 0.9) ; margin-bottom:20px; padding-bottom : 10px ; line-height:1.8;"
+      );
+      p.innerHTML = response.contenu;
+      const mainDivComments = document.querySelector(
+        ".mainDivComments" + response.idarticle
+      );
+      mainDivComments.appendChild(commentOwner);
+      mainDivComments.appendChild(p);
+    })
+    .catch((error) => {
+      console.error("this is an error ", error.message);
+    });
+  emailInput.value = "";
+  commentInput.value = "";
+  commentForm.style.display = "none";
+  const addcommentButon = document.querySelector(
+    `.addcommentButon${idarticle}`
+  );
+  addcommentButon.style.display = "block";
+};
+
 var posts, users, comments;
 // const myPagination = document.querySelector(".myPagination");
 let fetchPosts = async (number) => {
@@ -439,7 +593,10 @@ let fetchPosts = async (number) => {
         break;
       }
     }
-    var mainDivComments = "<div>";
+    var mainDivComments =
+      '<div class="mainDivComments mainDivComments' + idarticle + '">';
+    // const mainDivComments = document.createElement("div");
+    // mainDivComments.setAttribute("class", `mainDivComments${idarticle}`);
     let allComments = async () => {
       // console.log(comments);
       for (let i = 0; i < comments.length; i++) {
@@ -460,7 +617,12 @@ let fetchPosts = async (number) => {
           mainDivComments += p;
         }
       }
+
       mainDivComments += "</div>";
+      //we need to add a comment form to write the email and the contenu//we need to make
+      //we need to add a button in mainDive named add comment and when we click on it it will show the commentForm we will do it like this we add an event listener to the button and when we click on it we will change the display of the commentForm to block
+      let addcommentButon = `<button class="btn btn-primary addcommentButon${idarticle}" type="button" style="margin:0 auto ; display : block; width:fit-content ; background-color:rgb(32, 178, 170, 0.9);" onclick="addCommentForm(${post.idarticle});">Add Comment</button>`;
+      mainDivComments += addcommentButon;
     };
     allComments();
 
@@ -482,6 +644,8 @@ let fetchPosts = async (number) => {
       </div> </div>
  
     </div>`;
+    // const el = document.querySelector(".mainDivComments");
+    // el.classList.add(`mainDivComments${idarticle}`);
   }
   // myPagination.style = "background-color:rgb(32, 178, 170, 0.3)";
   // document.body.style = "background-color:rgb(32, 178, 170, 0.09)";
@@ -533,9 +697,10 @@ function navbar() {
   const searchInput = document.createElement("input");
   searchInput.setAttribute("type", "search");
   searchInput.setAttribute("placeholder", "search");
+  searchInput.style = "position: relative; right:90px;";
   const i = document.createElement("i");
-  //<i class="fa-solid fa-bars"></i>
-  i.setAttribute("class", "fa-solid fa-magnifying-glass");
+  // <i class=""></i>;
+  i.setAttribute("class", "fa-solid fa-bars");
   i.style = "font-size: 20px; color: #fff; position: absolute; right: 20px";
 
   // Create the profile image element
@@ -554,7 +719,7 @@ function navbar() {
   document.body.appendChild(navBar);
 }
 //we need to execute the function if the current page!= index.html
-if (window.location.href != "/") {
+if (!window.location.href.match(/\/$|\/#$/)) {
   navbar();
 }
 

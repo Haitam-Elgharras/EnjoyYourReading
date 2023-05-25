@@ -9,6 +9,7 @@ var router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const dotenv = require("dotenv");
+const { set } = require("./app");
 dotenv.config();
 
 //the authententication need just the email and the password
@@ -26,7 +27,7 @@ router.post("/", async (req, res, next) => {
   });
   // .catch((err) => res.json(err));
   //  const token = user.generateAuthToken();
-  if (user == {} || user == null)
+  if (!user || Object.keys(user).length === 0)
     return res.status(400).send("invalid email or password");
   if (user.password == req.body.password) {
     // it's a best practice to store the private key in an environment variable
@@ -34,10 +35,15 @@ router.post("/", async (req, res, next) => {
     const token = jwt.sign(
       {
         iduser: user.iduser,
+        name: user.name,
         email: user.email,
       },
       process.env.jwtPrivateKey
     );
+    setTimeout(() => {
+      console.log(token);
+    }, 1000);
+
     //I have a problem with the scure key it's always take the value from the default.json file
     //if a user login with a valid email and password we send a token to the user and the x-auth-token in the header of the response
     return res.header("x-auth-token", token).send(token);

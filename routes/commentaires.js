@@ -24,9 +24,9 @@ router.get("/:id([0-9]+)", (req, res, next) => {
 });
 
 //post commentaire
-router.post("/", auth, (req, res, next) => {
-  if (req.user.iduser != req.body.iduser)
-    return res.status(401).send("operation not allowed");
+router.post("/", (req, res, next) => {
+  // if (req.user.iduser != req.body.iduser)
+  //   return res.status(401).send("operation not allowed");
 
   addCommentaire(req.body).then((commentaire) => res.json(commentaire));
 });
