@@ -299,7 +299,7 @@ async function displayArticles(user) {
   );
   logoutnButton.setAttribute(
     "style",
-    "margin-right: 10px; position:fixed; top:0; right:0; "
+    "margin-right: 10px; position:fixed; top:200px; right:0;z-index:10000 "
   );
   // logoutDiv.appendChild(logoutnButton);
   document.body.appendChild(logoutnButton);
@@ -612,7 +612,7 @@ let fetchPosts = async (number) => {
           let commentOwner = `<h4 style=''>${name()}</h4>`;
           mainDivComments += commentOwner;
           let p =
-            "<p style='text-align:center ; border-bottom:1px solid rgb(32, 178, 170, 0.9) ; margin-bottom:20px; padding-bottom : 10px ; line-height:1.8;'>";
+            "<p style='padding-left:10px; border-bottom:1px solid rgb(32, 178, 170, 0.9) ; margin-bottom:20px; padding-bottom : 10px ; line-height:1.8;'>";
           p += comments[i].contenu + "</p>";
           mainDivComments += p;
         }
@@ -666,58 +666,86 @@ const order = async () => {
 
 //navbar#############################
 
+// function navbar() {
+//   // Create the navBar element
+//   const navBar = document.createElement("div");
+//   navBar.classList.add("navBar");
+//   navBar.style = "margin-top:10px";
+
 function navbar() {
   // Create the navBar element
   const navBar = document.createElement("div");
   navBar.classList.add("navBar");
-  navBar.style = "margin-top:10px";
+  // navBar.style.marginTop = "10px";
+  navBar.style = "z-index: 1000;position: relative; height: 100px;";
 
-  // div contain the heading and a slogan
-  const divSlogan = document.createElement("div");
-  divSlogan.style =
-    "display: flex; flex-direction: column; margin-left: 20px; justify-content: center; align-items: center;";
-  const slogan = document.createElement("span");
-  slogan.textContent = "Enjoy Your Reading";
-  slogan.style = "font-size: 12px; color: #fff;";
-  // Create the heading element
-  // const heading = document.createElement("h2");
-  // heading.textContent = "Blog";
-  const img = document.createElement("img");
-  img.setAttribute("src", "../images/logo.png");
-  img.setAttribute("width", "50px");
+  // Create the header element
+  const header = document.createElement("div");
+  header.classList.add("header");
 
-  // Append the heading and slogan elements to the div element
-  divSlogan.appendChild(img);
-  divSlogan.appendChild(slogan);
+  // Create the container element
+  const container = document.createElement("div");
+  container.classList.add("containerHeader");
 
-  // Create the section element
-  const section = document.createElement("section");
+  // Create the logo element
+  const logo = document.createElement("div");
+  logo.classList.add("logo");
 
-  // Create the search input element
-  const searchInput = document.createElement("input");
-  searchInput.setAttribute("type", "search");
-  searchInput.setAttribute("placeholder", "search");
-  searchInput.style = "position: relative; right:90px;";
-  const i = document.createElement("i");
-  // <i class=""></i>;
-  i.setAttribute("class", "fa-solid fa-bars");
-  i.style = "font-size: 20px; color: #fff; position: absolute; right: 20px";
+  const logoImg = document.createElement("img");
+  logoImg.src = "images/logo.png";
+  logoImg.alt = "";
+  logo.appendChild(logoImg);
 
-  // Create the profile image element
-  const profileImage = document.createElement("img");
-  // profileImage.setAttribute("src", "../images/profile.png");
-  profileImage.classList.add("profile");
+  container.appendChild(logo);
 
-  // Append the search input and profile image elements to the section element
-  section.appendChild(searchInput);
-  section.appendChild(profileImage);
-  section.appendChild(i);
+  // Create the nav element
+  const nav = document.createElement("div");
+  nav.classList.add("nav");
 
-  // Append the heading and section elements to the navBar element
-  navBar.appendChild(divSlogan);
-  navBar.appendChild(section);
+  const barsIcon = document.createElement("i");
+  barsIcon.classList.add("fa-solid", "fa-bars", "media");
+
+  const ul = document.createElement("ul");
+  ul.style = "margin:0";
+  const navItems = [
+    "HOME",
+    "SERVICES",
+    "PORTFOLIO",
+    "ABOUT",
+    "PRICING",
+    "CONTACT",
+  ];
+
+  navItems.forEach((item) => {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = `#${item}`;
+    a.textContent = item;
+    li.appendChild(a);
+    ul.appendChild(li);
+  });
+
+  nav.appendChild(barsIcon);
+  nav.appendChild(ul);
+
+  // Create the search element
+  const search = document.createElement("div");
+  search.classList.add("search");
+
+  const searchIcon = document.createElement("i");
+  searchIcon.classList.add("fa-solid", "fa-magnifying-glass");
+
+  search.appendChild(searchIcon);
+  nav.appendChild(search);
+
+  container.appendChild(nav);
+  header.appendChild(container);
+  navBar.appendChild(header);
+
+  // Append the navBar element to the document body
   document.body.appendChild(navBar);
 }
+
 //we need to execute the function if the current page!= index.html
 if (!window.location.href.match(/\/$|\/#$/)) {
   navbar();

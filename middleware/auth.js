@@ -1,5 +1,4 @@
 // this middleware is to check if the user is authentificated or not
-
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const dotenv = require("dotenv");
@@ -14,11 +13,9 @@ function auth(req, res, next) {
     //if there is a token we need to verify it
     // const decoded = jwt.verify(token, config.get("jwtPrivateKey"));
     const decoded = jwt.verify(token, process.env.jwtPrivateKey);
-    console.log(decoded);
     //when we decode the token we get an object that contains information about the user and the private key
     // so we store the decoded object in the req.user to use it in the next middleware
     req.user = decoded;
-
     next();
   } catch (ex) {
     //if the token is not valid we send a bad request

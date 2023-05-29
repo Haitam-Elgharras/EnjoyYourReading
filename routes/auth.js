@@ -12,7 +12,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 //the authententication need just the email and the password
-
 router.post("/", async (req, res, next) => {
   const userSchema = Joi.object({
     email: Joi.string().email().required(),
@@ -24,8 +23,6 @@ router.post("/", async (req, res, next) => {
       email: req.body.email,
     },
   });
-  // .catch((err) => res.json(err));
-  //  const token = user.generateAuthToken();
   if (user == {} || user == null)
     return res.status(400).send("invalid email or password");
   if (user.password == req.body.password) {

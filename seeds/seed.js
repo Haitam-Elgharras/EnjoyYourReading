@@ -16,52 +16,17 @@ Nota : l’exécution du fichier seed.js devra d’abord effacer le contenu de l
 const { Role } = require("@prisma/client");
 
 async function seed() {
-  //delete all the data from the database
-  await prisma.commentaire.deleteMany();
-  await prisma.articleCategorie.deleteMany();
-  await prisma.categorie.deleteMany();
   await prisma.article.deleteMany();
-  await prisma.user.deleteMany();
-  //create 10 users
-  for (let i = 0; i < 10; i++) {
-    await prisma.user.create({
-      data: {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-        role: Role.author,
-      },
-    });
-  }
-  //create 1 admin
-  await prisma.user.create({
-    data: {
-      name: faker.person.fullName(),
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-      role: Role.admin,
-    },
-  });
-  //create 10 categories
-  for (let i = 0; i < 10; i++) {
-    await prisma.categorie.create({
-      data: {
-        idcategorie: i + 1,
-        nom: faker.person.jobArea(),
-      },
-    });
-  }
   //create 100 articles
   for (let i = 0; i < 100; i++) {
     await prisma.article.create({
       data: {
-        idarticle: i + 1,
+        // idarticle: i + 1,
         title: faker.commerce.productName(),
         content: faker.lorem.paragraph(),
         image: faker.image.url(),
         // we need to know from which number the iduser start to have the ability to make a range between the start and the end of the iduser
         iduser: faker.number.int({ min: 1, max: 10 }),
-
         // we have a relation many to many between the article and the categorie so we need to add the categorie to the article
         articleCategorie: {
           create: [
@@ -74,17 +39,6 @@ async function seed() {
             },
           ],
         },
-      },
-    });
-  }
-  //create 100 comments
-  for (let i = 0; i < 100; i++) {
-    await prisma.commentaire.create({
-      data: {
-        contenu: faker.lorem.paragraph(),
-        iduser: faker.number.int({ min: 1, max: 10 }),
-        idarticle: faker.number.int({ min: 1, max: 100 }),
-        email: faker.internet.email(),
       },
     });
   }
