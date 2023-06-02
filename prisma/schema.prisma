@@ -30,7 +30,7 @@ model article {
   published        Boolean            @default(false)
   iduser           Int
   user             user               @relation(fields: [iduser], references: [iduser], onDelete: Cascade)
-  articleCategorie articleCategorie[]
+  articleCategorie articleCategorie[]//this table contain the id of the article and the id of the categorie
   commentaire      commentaire[]
 }
 

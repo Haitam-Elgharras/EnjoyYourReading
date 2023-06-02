@@ -60,27 +60,37 @@ a {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  margin-right: 33px;
 }
 
-.nav ul {
+.nav ul:not(.dropdown-menu) {
   display: flex;
 }
-.nav ul li a {
+
+.nav ul li a:not(.dropdown-item),
+.nav ul li a:not(.dropdown-item) button {
   /* to make the li respect the propreties */
   display: block;
   text-decoration: none;
   color: white;
   font-size: 14;
   transition: 0.3s;
-  padding: 40px 10px;
+}
+.nav ul li a:not(.dropdown-item) {
+  padding: 40px 0;
 }
 .nav ul li a:hover,
+.nav ul li a:hover button,
+.nav ul li a.active button,
 .nav ul li a.active {
   color: var(--main-color-two);
   border-bottom: var(--main-color-two) solid 1px;
   /* to make this border up to the line */
   position: relative;
   z-index: 2;
+}
+.nav ul li a {
+  color: white;
 }
 
 .header .nav .search {

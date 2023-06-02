@@ -9,6 +9,9 @@ function getAllArticles(req) {
       orderBy: {
         createdAt: "desc", //desc for descending order from the newest to the oldest
       },
+      include: {
+        articleCategorie: true,
+      },
     });
   }
   //if there is take and skip we return the articles we return the 10 first articles depending on time of creation
@@ -19,6 +22,9 @@ function getAllArticles(req) {
       skip: +req.query.skip,
       orderBy: {
         createdAt: "desc", //desc for descending order from the newest to the oldest
+      },
+      include: {
+        articleCategorie: true,
       },
     });
   }

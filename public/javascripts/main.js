@@ -18,7 +18,6 @@ const registerDiv = document.createElement("div");
 registerDiv.setAttribute("class", "register");
 const spanRegister = document.createElement("span");
 spanRegister.textContent = "Register";
-
 register.appendChild(spanRegister);
 registerDiv.appendChild(register);
 container.appendChild(registerDiv);
@@ -45,6 +44,8 @@ function registerForm(e) {
   container.innerHTML = "";
   registerDiv.classList.add("login-box");
   const form = document.createElement("form");
+  //the actoin is the route that we want to send the data to, in this case we want to send the data to the route /users
+  //the data in this case is the name , email and password , and they well be sent in the body of the request as a json object
   form.setAttribute("action", "/users");
   form.setAttribute("method", "post");
   form.setAttribute("id", "registerForm");
@@ -90,6 +91,7 @@ function loginForm() {
   container.innerHTML = "";
   loginDiv.innerHTML = " <h2>Welcome Back!</h2>";
   const form = document.createElement("form");
+  //the attr action doesn't have a specific role here because we are using the fetch api to send the data to the server
   form.setAttribute("action", "/auth");
   form.setAttribute("method", "post");
   form.setAttribute("id", "loginForm");
@@ -122,7 +124,6 @@ function loginForm() {
     //loading animation
     const spans = document.querySelectorAll("#submit-animation span");
     spans.forEach((span) => span.classList.add("active"));
-    //
     loginToken(e);
   });
 }
@@ -146,8 +147,26 @@ function loginToken(e) {
   })
     .then((res) => {
       if (res.status == 400) {
-        //will be executed if the email or the password is wrong
-        e.target.submit();
+        //create a div to show the error message
+        loginDiv.textContent = "";
+
+        const errorDiv = document.createElement("div");
+        errorDiv.setAttribute("class", "error");
+        errorDiv.textContent = "Email or password is wrong";
+        errorDiv.style = "z-index: 3;";
+        loginDiv.appendChild(errorDiv);
+        //remove the loading animation
+        const spans = document.querySelectorAll("#submit-animation span");
+        spans.forEach((span) => span.classList.remove("active"));
+        //make a return button to the login form
+        const returnButton = document.createElement("button");
+        returnButton.setAttribute("class", "custom-btn btn-3");
+        returnButton.textContent = "Return";
+        returnButton.style = "z-index: 3;";
+        loginDiv.appendChild(returnButton);
+        returnButton.addEventListener("click", loginForm);
+        // //will be executed if the email or the password is wrong
+        // e.target.submit();
       }
       return res;
     })
@@ -251,11 +270,11 @@ window.addEventListener("load", async () => {
 //this function just when the user is logged or registered
 
 let totalPages = 20;
-let page = 10;
+let page = 1; //the page number
 // Create the pagination elements
 const pagination = document.createElement("div");
 pagination.classList.add("pagination");
-const myPagination = document.createElement("div");
+var myPagination = document.createElement("div");
 myPagination.classList.add("myPagination");
 
 // creating required element
@@ -279,30 +298,28 @@ divTwo.classList.add("two");
 const divThree = document.createElement("div");
 divThree.classList.add("three");
 
-const logoutnButton = document.createElement("button");
-logoutnButton.setAttribute("class", "custom-btn btn-3");
-logoutnButton.setAttribute("id", "logout");
-logoutnButton.addEventListener("click", logout);
-const spanLogout = document.createElement("span");
-spanLogout.textContent = "Logout";
-logoutnButton.appendChild(spanLogout);
+// const logoutnButton = document.createElement("button");
+// logoutnButton.setAttribute("class", "custom-btn btn-3");
+// logoutnButton.setAttribute("id", "logout");
 // logoutnButton.addEventListener("click", logout);
+// const spanLogout = document.createElement("span");
+// spanLogout.textContent = "Logout";
+// logoutnButton.appendChild(spanLogout);
 
 async function displayArticles(user) {
   document.body.innerHTML = "";
   navbar();
-  const logoutDiv = document.createElement("div");
-  logoutDiv.setAttribute("class", "logout");
-  logoutDiv.setAttribute(
-    "style",
-    "display:flex; justify-content: flex-end;width:100vw;position:fixed; top:0; right:0; padding: 10px; background-color:transparent; z-index: 100000; "
-  );
-  logoutnButton.setAttribute(
-    "style",
-    "margin-right: 10px; position:fixed; top:200px; right:0;z-index:10000 "
-  );
-  // logoutDiv.appendChild(logoutnButton);
-  document.body.appendChild(logoutnButton);
+  // const logoutDiv = document.createElement("div");
+  // logoutDiv.setAttribute("class", "logout");
+  // logoutDiv.setAttribute(
+  //   "style",
+  //   "display:flex; justify-content: flex-end;width:100vw;position:fixed; top:0; right:0; padding: 10px; background-color:transparent; z-index: 100000; "
+  // );
+  // logoutnButton.setAttribute(
+  //   "style",
+  //   "margin-right: 10px; position:fixed; top:200px; right:0;z-index:10000 "
+  // );
+  // document.body.appendChild(logoutnButton);
 
   // Nest the divs inside the load animation
   load.appendChild(divOne);
@@ -320,90 +337,109 @@ async function displayArticles(user) {
   articlesContainer.appendChild(pagination);
   articlesContainer.appendChild(myPagination);
   document.body.appendChild(articlesContainer);
-  await createPagination(totalPages, page);
+  const elm = await createPagination(totalPages, page);
   fetchPosts(page);
-  order();
+  order(elm);
 }
 const element = document.createElement("ul");
 
 //calling function with passing parameters and adding inside element which is ul tag
-async function createPagination(totalPages, page) {
-  loading.style.setProperty("display", "flex");
-  await fetchPosts(page);
-  loading.style.setProperty("display", "none");
+async function createPagination(totalPages, page, byCategories = 0) {
+  // if (byCategories == 1) {
+  //   // we will create juste one button with the active class and has the number 1
+  //   element.innerHTML = `<li class="first numb active" onclick="createPagination(totalPages, ${page})"><a href="#">${page}</a></li>`;
+  // } else {
+  //for the categories we need to do an if statment to show all the articles of a category in one page
+  if (byCategories == 1 || totalPages == 1) {
+    //then we will creat just the 1 button with the active class
+    loading.style.setProperty("display", "flex");
+    await fetchPosts(page);
+    loading.style.setProperty("display", "none");
 
-  // await there();
-  let liTag = "";
-  let active;
-  let beforePage = page - 1;
-  let afterPage = page + 1;
-  if (page > 1) {
-    //show the next button if the page value is greater than 1
-    liTag += `<li class="btnp prev" onclick="createPagination(totalPages, ${
-      page - 1
-    })"><span style="display: flex; justify-content: center; align-items: center"><i style="position: relative; left: -12px" class="fas fa-angle-left"></i> Prev</span></li>`;
-  }
+    let liTag = "";
 
-  if (page > 2) {
-    //if page value is greater than 2 then add 1 after the previous button
-    liTag += `<li class="first numb" onclick="createPagination(totalPages, 1)"><span>1</span></li>`;
-    if (page > 3) {
-      //if page value is greater than 3 then add  (...) after the first li or page
-      liTag += `<li class="dots"><span>...</span></li>`;
+    liTag += `<li class="first numb active" onclick="createPagination(totalPages, ${page})"><span>${page}</span></li>`;
+    element.innerHTML = liTag;
+    return liTag;
+  } else {
+    loading.style.setProperty("display", "flex");
+    await fetchPosts(page);
+    loading.style.setProperty("display", "none");
+
+    // await there();
+    let liTag = "";
+    let active;
+    let beforePage = page - 1;
+    let afterPage = page + 1;
+    if (page > 1) {
+      //show the next button if the page value is greater than 1
+      liTag += `<li class="btnp prev" onclick="createPagination(totalPages, ${
+        page - 1
+      })"><span style="display: flex; justify-content: center; align-items: center"><i style="position: relative; left: -12px" class="fas fa-angle-left"></i> Prev</span></li>`;
     }
-  }
 
-  // how many pages or li show before the current li
-  if (page == totalPages) {
-    //with 20 we want also 17
-    beforePage = beforePage - 2;
-  } else if (page == totalPages - 1) {
-    beforePage = beforePage - 1;
-  }
-  // how many pages or li show after the current li
-  if (page == 1) {
-    afterPage = afterPage + 2;
-  } else if (page == 2) {
-    afterPage = afterPage + 1;
-  }
+    if (page > 2) {
+      //if page value is greater than 2 then add 1 after the previous button
+      liTag += `<li class="first numb" onclick="createPagination(totalPages, 1)"><span>1</span></li>`;
+      if (page > 3) {
+        //if page value is greater than 3 then add  (...) after the first li or page
+        liTag += `<li class="dots"><span>...</span></li>`;
+      }
+    }
 
-  for (var plength = beforePage; plength <= afterPage; plength++) {
-    if (plength > totalPages) {
-      //if plength is greater than totalPage length then break
-      break;
+    // how many pages or li show before the current li
+    if (page == totalPages) {
+      //with 20 we want also 17
+      beforePage = beforePage - 2;
+    } else if (page == totalPages - 1) {
+      beforePage = beforePage - 1;
     }
-    if (plength == 0) {
-      //if plength is 0 than add +1 in plength value
-      continue;
+    // how many pages or li show after the current li
+    if (page == 1) {
+      afterPage = afterPage + 2;
+    } else if (page == 2) {
+      afterPage = afterPage + 1;
     }
-    if (page == plength) {
-      //if page is equal to plength than assign active string in the active variable
-      active = "active";
-    } else {
-      //else leave empty to the active variable
-      active = "";
-    }
-    liTag += `<li class="numb ${active}" onclick="createPagination(totalPages, ${plength})"><span>${plength}</span></li>`;
-  }
 
-  if (page < totalPages - 1) {
-    //if page value is less than totalPage value by -1 then show the last li or page
-    if (page < totalPages - 2) {
-      //if page value is less than totalPage value by -2 then add this (...) before the last li or page
-      liTag += `<li class="dots"><span>...</span></li>`;
+    for (var plength = beforePage; plength <= afterPage; plength++) {
+      if (plength > totalPages) {
+        //if plength is greater than totalPage length then break
+        break;
+      }
+      if (plength == 0) {
+        //if plength is 0 than add +1 in plength value
+        continue;
+      }
+      if (page == plength) {
+        //if page is equal to plength than assign active string in the active variable
+        active = "active";
+      } else {
+        //else leave empty to the active variable
+        active = "";
+      }
+      liTag += `<li class="numb ${active}" onclick="createPagination(totalPages, ${plength})"><span>${plength}</span></li>`;
     }
-    liTag += `<li class="last numb" onclick="createPagination(totalPages, ${totalPages})"><span>${totalPages}</span></li>`;
-  }
 
-  if (page < totalPages) {
-    //show the next button if the page value is less than totalPage(20)
-    liTag += `<li class="btnp next" onclick="createPagination(totalPages, ${
-      page + 1
-    })"><span style="display: flex; justify-content: center; align-items: center" >Next <i class="fas fa-angle-right" style="position: relative; right: -12px"></i></span></li>`;
+    if (page < totalPages - 1) {
+      //if page value is less than totalPage value by -1 then show the last li or page
+      if (page < totalPages - 2) {
+        //if page value is less than totalPage value by -2 then add this (...) before the last li or page
+        liTag += `<li class="dots"><span>...</span></li>`;
+      }
+      liTag += `<li class="last numb" onclick="createPagination(totalPages, ${totalPages})"><span>${totalPages}</span></li>`;
+    }
+
+    if (page < totalPages) {
+      //show the next button if the page value is less than totalPage(20)
+      liTag += `<li class="btnp next" onclick="createPagination(totalPages, ${
+        page + 1
+      })"><span style="display: flex; justify-content: center; align-items: center" >Next <i class="fas fa-angle-right" style="position: relative; right: -12px"></i></span></li>`;
+    }
+    element.innerHTML = liTag; //add li tag inside ul tag
+    return liTag; //reurn the li tag
   }
-  element.innerHTML = liTag; //add li tag inside ul tag
-  return liTag; //reurn the li tag
 }
+
 //end pagination
 
 //addcommentForm
@@ -551,82 +587,135 @@ fetchComment = async (idarticle) => {
 
 var posts, users, comments;
 // const myPagination = document.querySelector(".myPagination");
-let fetchPosts = async (number) => {
-  myPagination.innerHTML = "";
-  document.body.style = "background-color:rgb(32, 178, 170, 0)";
-  myPagination.style = "background-color:rgb(32, 178, 170, 0)";
-  if (firstTime == true && localStorage.getItem("token") != null) {
-    firstTime = false;
-    comments = await fetch("/commentaires").then(async (response) => {
-      let myData = await response.json();
-      return myData;
-    });
-    users = await fetch("/users").then(async (response) => {
-      let myData = await response.json();
-      return myData;
-    });
-    posts = await fetch("/articles").then(async (response) => {
-      let myData = await response.json();
-      return myData;
-    });
-  }
-  // let posts = await fetch("/articles").then(async (response) => {
-  //   let myData = await response.json();
-  //   return myData;
-  // });
-  // let users = await fetch("/users").then(async (response) => {
-  //   let myData = await response.json();
-  //   return myData;
-  // });
-  // let comments = await fetch("/commentaires").then(async (response) => {
-  //   let myData = await response.json();
-  //   return myData;
-  // });
-  // let i = 0;
-  for (let j = number * 5 - 5; j < number * 5; j++) {
-    // console.log(j);
-    let post = posts[j];
-    const { iduser, idarticle, title, content } = post;
-    for (let i = 0; i < users.length; i++) {
-      if (users[i].iduser == iduser) {
-        userName = users[i].name;
-        break;
-      }
-    }
-    var mainDivComments =
-      '<div class="mainDivComments mainDivComments' + idarticle + '">';
-    // const mainDivComments = document.createElement("div");
-    // mainDivComments.setAttribute("class", `mainDivComments${idarticle}`);
-    let allComments = async () => {
-      // console.log(comments);
-      for (let i = 0; i < comments.length; i++) {
-        if (idarticle == comments[i].idarticle) {
-          const name = () => {
-            // console.log(users);
-            for (let k = 0; k < users.length; k++) {
-              if (users[k].iduser == comments[i].iduser) return users[k].name;
-            }
-            return "";
-          };
-          if (name() == "") continue;
-          let commentOwner = `<h4 style=''>${name()}</h4>`;
-          mainDivComments += commentOwner;
-          let p =
-            "<p style='padding-left:10px; border-bottom:1px solid rgb(32, 178, 170, 0.9) ; margin-bottom:20px; padding-bottom : 10px ; line-height:1.8;'>";
-          p += comments[i].contenu + "</p>";
-          mainDivComments += p;
+let fetchPosts = async (number, totalPages, thePosts, byCategories = 0) => {
+  if (byCategories == 1 || totalPages == 1) {
+    myPagination.innerHTML = "";
+    for (let j = 0; j < thePosts.length; j++) {
+      let post = thePosts[j];
+      console.log("the post ", post);
+      const { iduser, idarticle, title, content } = post;
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].iduser == iduser) {
+          var userName = users[i].name;
+          break;
         }
       }
+      var mainDivComments = `<div class="mainDivComments mainDivComments${idarticle}">`;
+      let allComments = async () => {
+        for (let i = 0; i < comments.length; i++) {
+          if (comments[i].idarticle == idarticle) {
+            const name = () => {
+              for (let j = 0; j < users.length; j++) {
+                if (users[j].iduser == comments[i].iduser) {
+                  return users[j].name;
+                }
+              }
+              return "";
+            };
+            if (name() == "") {
+              continue;
+            }
+            let commentOwner = `<h4>${name()}</h4>`;
+            mainDivComments += commentOwner;
+            let p = `<p style="text-align:center ; border-bottom:1px solid rgb(32, 178, 170, 0.9) ; margin-bottom:20px; padding-bottom : 10px ; line-height:1.8;">${comments[i].contenu}</p>`;
+            mainDivComments += p;
+          }
+        }
+        mainDivComments += "</div>";
+        let addcommentButon = `<button class="btn btn-primary addcommentButon${idarticle}" type="button" style="margin:0 auto ; display : block; width:fit-content ; background-color:rgb(32, 178, 170, 0.9);" onclick="addCommentForm(${post.idarticle});">Add Comment</button>`;
+        mainDivComments += addcommentButon;
+      };
+      allComments();
+      console.log(
+        "mainDivComments",
+        mainDivComments,
+        "idarticle",
+        idarticle,
+        "usernmae",
+        userName
+      );
+      myPagination.innerHTML += `<div class="card" style="max-width: 50rem; background-color: #fff ; margin : 10px auto;padding:0 10px 10px">
+      <img src="http://picsum.photos/800/300?${iduser}" class="card-img-top" alt="...">
+      <div class="card-body">
+      <h3 class="card-title" >${userName}</h3>
+        <h5 class="card-title" >${title}</h5>
+        <p class="card-text">${content}</p>
+      </div>
+      <p>
+      <button class="btn btn-primary" type="button" style="margin:0 auto ; display : block; width:fit-content ; background-color:rgb(32, 178, 170)" data-bs-toggle="collapse" data-bs-target="#collapseExample${post.idarticle}" aria-expanded="false" aria-controls="collapseExample">
+      show comments
+      </button>
+      </p>
+      <div class="collapse" id="collapseExample${post.idarticle}">
+        <div class="card card-body">
+      ${mainDivComments}
+        </div> </div>
+      </div>`;
+    }
+    console.log("myPagination fill ", myPagination);
+  } else {
+    //number represent the number of posts to show
+    myPagination.innerHTML = "";
+    document.body.style = "background-color:rgb(32, 178, 170, 0)";
+    if (firstTime == true && localStorage.getItem("token") != null) {
+      firstTime = false;
+      comments = await fetch("/commentaires").then(async (response) => {
+        let myData = await response.json();
+        return myData;
+      });
+      users = await fetch("/users").then(async (response) => {
+        let myData = await response.json();
+        return myData;
+      });
+      posts = await fetch("/articles").then(async (response) => {
+        let myData = await response.json();
+        return myData;
+      });
+    }
+    for (let j = number * 5 - 5; j < number * 5; j++) {
+      // console.log(j);
+      let post = posts[j];
+      const { iduser, idarticle, title, content } = post;
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].iduser == iduser) {
+          userName = users[i].name;
+          break;
+        }
+      }
+      var mainDivComments =
+        '<div class="mainDivComments mainDivComments' + idarticle + '">';
+      // const mainDivComments = document.createElement("div");
+      // mainDivComments.setAttribute("class", `mainDivComments${idarticle}`);
+      let allComments = async () => {
+        // console.log(comments);
+        for (let i = 0; i < comments.length; i++) {
+          if (idarticle == comments[i].idarticle) {
+            const name = () => {
+              // console.log(users);
+              for (let k = 0; k < users.length; k++) {
+                if (users[k].iduser == comments[i].iduser) return users[k].name;
+              }
+              return "";
+            };
+            if (name() == "") continue;
+            let commentOwner = `<h4 style=''>${name()}</h4>`;
+            mainDivComments += commentOwner;
+            let p =
+              "<p style='padding-left:10px; border-bottom:1px solid rgb(32, 178, 170, 0.9) ; margin-bottom:20px; padding-bottom : 10px ; line-height:1.8;'>";
+            p += comments[i].contenu + "</p>";
+            mainDivComments += p;
+          }
+        }
 
-      mainDivComments += "</div>";
-      //we need to add a comment form to write the email and the contenu//we need to make
-      //we need to add a button in mainDive named add comment and when we click on it it will show the commentForm we will do it like this we add an event listener to the button and when we click on it we will change the display of the commentForm to block
-      let addcommentButon = `<button class="btn btn-primary addcommentButon${idarticle}" type="button" style="margin:0 auto ; display : block; width:fit-content ; background-color:rgb(32, 178, 170, 0.9);" onclick="addCommentForm(${post.idarticle});">Add Comment</button>`;
-      mainDivComments += addcommentButon;
-    };
-    allComments();
+        mainDivComments += "</div>";
+        //we need to add a comment form to write the email and the contenu//we need to make
+        //we need to add a button in mainDive named add comment and when we click on it it will show the commentForm we will do it like this we add an event listener to the button and when we click on it we will change the display of the commentForm to block
+        let addcommentButon = `<button class="btn btn-primary addcommentButon${idarticle}" type="button" style="margin:0 auto ; display : block; width:fit-content ; background-color:rgb(32, 178, 170, 0.9);" onclick="addCommentForm(${post.idarticle});">Add Comment</button>`;
+        mainDivComments += addcommentButon;
+      };
+      allComments();
 
-    myPagination.innerHTML += `<div class="card" style="max-width: 50rem; background-color: #fff ; margin : 10px auto;padding:0 10px 10px">
+      myPagination.innerHTML += `<div class="card" style="max-width: 50rem; background-color: #fff ; margin : 10px auto;padding:0 10px 10px">
     <img src="http://picsum.photos/800/300?${iduser}" class="card-img-top" alt="...">
     <div class="card-body">
     <h3 class="card-title" >${userName}</h3>
@@ -644,20 +733,22 @@ let fetchPosts = async (number) => {
       </div> </div>
  
     </div>`;
-    // const el = document.querySelector(".mainDivComments");
-    // el.classList.add(`mainDivComments${idarticle}`);
+      // const el = document.querySelector(".mainDivComments");
+      // el.classList.add(`mainDivComments${idarticle}`);
+    }
+    // myPagination.style = "background-color:rgb(32, 178, 170, 0.3)";
+    // document.body.style = "background-color:rgb(32, 178, 170, 0.09)";
   }
-  // myPagination.style = "background-color:rgb(32, 178, 170, 0.3)";
-  // document.body.style = "background-color:rgb(32, 178, 170, 0.09)";
 };
 
 const hidAnimation = () => {
   loading.style.setProperty("display", "none");
 };
 
-const order = async () => {
-  await fetchPosts(10);
-  element.innerHTML = createPagination(totalPages, page);
+const order = async (elm) => {
+  await fetchPosts(1); //10 represent the page to be filled
+  element.innerHTML = elm;
+  // createPagination
   pagination.append(element);
   hidAnimation();
 };
@@ -690,6 +781,7 @@ function navbar() {
   // Create the logo element
   const logo = document.createElement("div");
   logo.classList.add("logo");
+  logo.style = "margin-left:25px";
 
   const logoImg = document.createElement("img");
   logoImg.src = "images/logo.png";
@@ -707,20 +799,28 @@ function navbar() {
 
   const ul = document.createElement("ul");
   ul.style = "margin:0";
-  const navItems = [
-    "HOME",
-    "SERVICES",
-    "PORTFOLIO",
-    "ABOUT",
-    "PRICING",
-    "CONTACT",
-  ];
+  const navItems = ["HOME", "PROFILE", "CATEGORIES", "SETTINGS", "CONTACT"];
 
   navItems.forEach((item) => {
     const li = document.createElement("li");
     const a = document.createElement("a");
     a.href = `#${item}`;
-    a.textContent = item;
+    a.classList.add(`${item}`);
+    a.classList.add("dropdown");
+    li.classList.add(`${item}`);
+    // a.textContent = item;
+    const button = document.createElement("button");
+    button.classList.add("btn", "btn-secondary", "dropdown-toggle");
+    button.type = "button";
+    button.setAttribute("data-bs-toggle", "dropdown");
+    button.setAttribute("aria-expanded", "false");
+    button.textContent = `${item}`;
+    button.style = "border:none;background:none;margin:0";
+    //when the button is hover do a click on it
+    button.addEventListener("mouseover", () => {
+      button.click();
+    });
+    a.appendChild(button);
     li.appendChild(a);
     ul.appendChild(li);
   });
@@ -744,6 +844,90 @@ function navbar() {
 
   // Append the navBar element to the document body
   document.body.appendChild(navBar);
+  categoriesListe();
+  settingsListe();
+}
+
+function settingsListe() {
+  const SETTINGS = document.querySelector("a.SETTINGS");
+  const ul = document.createElement("ul");
+  ul.classList.add("dropdown-menu");
+  ul.style = "background: rgb(42,42,42,0.4);";
+  const li = document.createElement("li");
+  const a = document.createElement("a");
+  a.classList.add("dropdown-item");
+  a.href = `#`;
+  a.textContent = "logout";
+  li.appendChild(a);
+  ul.appendChild(li);
+  SETTINGS.appendChild(ul);
+  li.addEventListener("click", logout);
+}
+async function categoriesListe() {
+  const CATEGORIES = document.querySelector("a.CATEGORIES");
+  const ul = document.createElement("ul");
+  ul.classList.add("dropdown-menu");
+  ul.style = "background: rgb(42,42,42,0.4);";
+  const categories = await fetchCategories();
+  categories.forEach((categorie) => {
+    const li = document.createElement("li");
+    li.classList.add(`${categorie.nom}`);
+    //when the user click on the categorie we need to show the articles of this categorie
+    li.addEventListener("click", () => {
+      console.log("this is the idcategorie", categorie.idcategorie);
+      fetchPostsByCategorie(categorie.idcategorie);
+    });
+    const a = document.createElement("a");
+    a.classList.add("dropdown-item");
+    a.href = `#${categorie.nom}`;
+    a.textContent = categorie.nom;
+    li.appendChild(a);
+    ul.appendChild(li);
+  });
+  CATEGORIES.appendChild(ul);
+}
+async function fetchCategories() {
+  return fetch("http://localhost:3000/categories")
+    .then((response) => response.json())
+    .then((data) => data);
+}
+var categories = fetchCategories();
+async function fetchPostsByCategorie(id) {
+  // we have the table of posts and the table of categories so we need just to filter the posts by categorie
+  const categorie = await categories;
+  // console.log(categories);
+  console.log(categorie);
+
+  // we will chose the categorie by id
+  const theCategorie = categorie.filter(
+    (categorie) => categorie.idcategorie === id
+  );
+
+  // we will chose the posts by categorie
+
+  const thePosts = posts.filter(
+    (post) =>
+      post.articleCategorie[0].idcategorie === theCategorie[0].idcategorie
+  );
+  // we will show the posts if the posts are not empty
+  if (thePosts.length !== 0) {
+    const one = 1;
+    const byCategories = 1;
+    const elm = await createPagination(totalPages, page, byCategories);
+    // console.log("first child", myPagination.firstChild);
+    // myPagination.innerHTML = "";
+    // console.log("first ", myPagination);
+    // console.log("first child", myPagination.firstChild);
+    while (myPagination.firstChild) {
+      myPagination.removeChild(myPagination.firstChild);
+      console.log("remove");
+    }
+    console.log("first child", myPagination);
+    await fetchPosts(one, one, thePosts, byCategories);
+    order(elm);
+  } else {
+    alert("there is no posts in this categorie");
+  }
 }
 
 //we need to execute the function if the current page!= index.html
@@ -763,8 +947,9 @@ function addArticle() {
 
   // Create the profile image element
   const profileImage = document.createElement("img");
-  profileImage.setAttribute("src", "images/proFile.png");
+  profileImage.setAttribute("src", "../images/profile.webp");
   profileImage.setAttribute("width", "30px");
+  profileImage.style = "border-radius: 50%;";
   profileImage.classList.add("userProfileImage");
 
   // Create the input element

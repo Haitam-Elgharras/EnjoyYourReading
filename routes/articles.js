@@ -70,9 +70,11 @@ router.delete("/:id([0-9]+)", auth, async (req, res, next) => {
   const Article = await prisma.article.findUnique({
     where: { idarticle: +req.params.id },
   });
+
   //a user doesn't have the abilty to delete an article with the id of another user
   if (Article.iduser != req.user.iduser) {
-    /*even when using res.status or res.send, you still need to include the return statement to ensure that the function exits early and no further code is executed. */
+    //even when using res.status or res.send, you still need to include the return statement
+    //to ensure that the function exits early and no further code is executed.
     return res.status(401).send("invalid operation");
   }
 
