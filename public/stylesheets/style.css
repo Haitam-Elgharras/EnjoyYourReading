@@ -471,9 +471,10 @@ ul {
 }
 .pagination ul {
   display: flex;
+  justify-content: center;
+  align-items: center;
   width: 468px;
   background-color: rgb(32, 178, 170, 0.9);
-  /* background-color: rgb(3, 233, 244, 0.7); */
   padding: 8px;
   border-radius: 50px;
   margin: 0 auto;
@@ -646,12 +647,15 @@ ul {
   width: 100%;
 }
 
-.addarticleInput button {
-  padding: 9px 22px;
+.addarticleInput button,
+.addarticleInput select {
+  padding: 7px 7px;
+  text-align: center;
   background-color: var(--blue);
   border: none;
   color: var(--white);
   font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
+  width: 91px;
 }

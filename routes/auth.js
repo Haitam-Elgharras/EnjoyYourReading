@@ -28,10 +28,12 @@ router.post("/", async (req, res, next) => {
   if (user.password == req.body.password) {
     // it's a best practice to store the private key in an environment variable
     //and also prefix it with the name of the app like blog_jwtPrivateKey
+    //we need to add an expiration date to the token like this : { expiresIn: '7d' }
     const token = jwt.sign(
       {
         iduser: user.iduser,
         email: user.email,
+        name: user.name,
       },
       process.env.jwtPrivateKey
     );

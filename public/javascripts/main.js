@@ -281,6 +281,7 @@ myPagination.classList.add("myPagination");
 // Create the outer container element
 const articlesContainer = document.createElement("div");
 articlesContainer.classList.add("articlesContainer");
+articlesContainer.style.transition = "0.5s";
 
 // Create the loading section
 const loading = document.createElement("div");
@@ -309,18 +310,6 @@ divThree.classList.add("three");
 async function displayArticles(user) {
   document.body.innerHTML = "";
   navbar();
-  // const logoutDiv = document.createElement("div");
-  // logoutDiv.setAttribute("class", "logout");
-  // logoutDiv.setAttribute(
-  //   "style",
-  //   "display:flex; justify-content: flex-end;width:100vw;position:fixed; top:0; right:0; padding: 10px; background-color:transparent; z-index: 100000; "
-  // );
-  // logoutnButton.setAttribute(
-  //   "style",
-  //   "margin-right: 10px; position:fixed; top:200px; right:0;z-index:10000 "
-  // );
-  // document.body.appendChild(logoutnButton);
-
   // Nest the divs inside the load animation
   load.appendChild(divOne);
   load.appendChild(divTwo);
@@ -330,7 +319,7 @@ async function displayArticles(user) {
   loading.appendChild(load);
 
   // Nest the pagination elements inside the articles container
-  const el = addArticle();
+  const el = await addArticle();
   document.body.appendChild(el[0]);
   document.body.appendChild(el[1]);
   articlesContainer.appendChild(loading);
@@ -592,7 +581,6 @@ let fetchPosts = async (number, totalPages, thePosts, byCategories = 0) => {
     myPagination.innerHTML = "";
     for (let j = 0; j < thePosts.length; j++) {
       let post = thePosts[j];
-      console.log("the post ", post);
       const { iduser, idarticle, title, content } = post;
       for (let i = 0; i < users.length; i++) {
         if (users[i].iduser == iduser) {
@@ -626,14 +614,6 @@ let fetchPosts = async (number, totalPages, thePosts, byCategories = 0) => {
         mainDivComments += addcommentButon;
       };
       allComments();
-      console.log(
-        "mainDivComments",
-        mainDivComments,
-        "idarticle",
-        idarticle,
-        "usernmae",
-        userName
-      );
       myPagination.innerHTML += `<div class="card" style="max-width: 50rem; background-color: #fff ; margin : 10px auto;padding:0 10px 10px">
       <img src="http://picsum.photos/800/300?${iduser}" class="card-img-top" alt="...">
       <div class="card-body">
@@ -652,7 +632,6 @@ let fetchPosts = async (number, totalPages, thePosts, byCategories = 0) => {
         </div> </div>
       </div>`;
     }
-    console.log("myPagination fill ", myPagination);
   } else {
     //number represent the number of posts to show
     myPagination.innerHTML = "";
@@ -874,7 +853,6 @@ async function categoriesListe() {
     li.classList.add(`${categorie.nom}`);
     //when the user click on the categorie we need to show the articles of this categorie
     li.addEventListener("click", () => {
-      console.log("this is the idcategorie", categorie.idcategorie);
       fetchPostsByCategorie(categorie.idcategorie);
     });
     const a = document.createElement("a");
@@ -884,6 +862,17 @@ async function categoriesListe() {
     li.appendChild(a);
     ul.appendChild(li);
   });
+  const li = document.createElement("li");
+  li.classList.add("all");
+  li.addEventListener("click", () => {
+    displayArticles();
+  });
+  const a = document.createElement("a");
+  a.classList.add("dropdown-item");
+  a.href = `#all`;
+  a.textContent = "all";
+  li.appendChild(a);
+  ul.appendChild(li);
   CATEGORIES.appendChild(ul);
 }
 async function fetchCategories() {
@@ -896,7 +885,6 @@ async function fetchPostsByCategorie(id) {
   // we have the table of posts and the table of categories so we need just to filter the posts by categorie
   const categorie = await categories;
   // console.log(categories);
-  console.log(categorie);
 
   // we will chose the categorie by id
   const theCategorie = categorie.filter(
@@ -913,18 +901,9 @@ async function fetchPostsByCategorie(id) {
   if (thePosts.length !== 0) {
     const one = 1;
     const byCategories = 1;
-    const elm = await createPagination(totalPages, page, byCategories);
-    // console.log("first child", myPagination.firstChild);
-    // myPagination.innerHTML = "";
-    // console.log("first ", myPagination);
-    // console.log("first child", myPagination.firstChild);
-    while (myPagination.firstChild) {
-      myPagination.removeChild(myPagination.firstChild);
-      console.log("remove");
-    }
-    console.log("first child", myPagination);
+    await createPagination(totalPages, page, byCategories);
+    myPagination.innerHTML = "";
     await fetchPosts(one, one, thePosts, byCategories);
-    order(elm);
   } else {
     alert("there is no posts in this categorie");
   }
@@ -937,10 +916,11 @@ if (!window.location.href.match(/\/$|\/#$/)) {
 
 //add article ###############
 
-function addArticle() {
+async function addArticle() {
   // Create the addPostInput element
   const addArticleInput = document.createElement("div");
   addArticleInput.classList.add("addArticleInput");
+  addArticleInput.style.transition = "0.5s";
 
   // Create the section element
   const section = document.createElement("section");
@@ -952,37 +932,198 @@ function addArticle() {
   profileImage.style = "border-radius: 50%;";
   profileImage.classList.add("userProfileImage");
 
-  // Create the input element
-  const input = document.createElement("input");
-  input.setAttribute("id", "textInput");
-  input.setAttribute("placeholder", "write something here");
-  input.setAttribute("type", "text");
-  input.setAttribute("maxlength", "80");
-
-  //           <i class="fa-solid fa-magnifying-glass"></i>
-  const i = document.createElement("i");
-  i.setAttribute("class", "fa-solid fa-magnifying-glass");
-  i.style =
-    "font-size: 20px; color: #fff; position: absolute; right: 20px;font-weight: 900;";
-  input.appendChild(i);
-
+  //we will make a textArea instead of input
+  const textArea = document.createElement("textarea");
+  textArea.setAttribute("id", "textInput");
+  textArea.setAttribute("placeholder", "share your thoughts...");
+  textArea.setAttribute("type", "text");
+  textArea.setAttribute("maxlength", "800");
+  textArea.style =
+    "width: 100%; height: 100%; border: none; resize: none; outline: none; padding: 10px 15px;transition: 0.5s;";
+  textArea.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") {
+      submitArticle();
+    }
+  });
+  //when the user click on the textArea we will show the post button and also we will make the textArea biggerwith more rows
+  addArticleInput.addEventListener("click", () => {
+    const articlesContainer = document.querySelector(".articlesContainer");
+    articlesContainer.style.position = "relative";
+    articlesContainer.style.top = "60px";
+    //I will add the element of text area seperatly because I want to make the text area bigger when the user click on it
+    textArea.style.height = "150px";
+    addArticleInput.style.height = "150px";
+    addArticleInput.style.top = "60px";
+    textArea.style.rows = "6";
+    articleAddButton.style.display = "block";
+    categorie.style.display = "block";
+  });
+  addArticleInput.addEventListener("mouseleave", () => {
+    if (textArea.value.length === 0) {
+      textArea.style.height = "100%";
+      addArticleInput.style.height = "60px";
+      textArea.style.rows = "1";
+      articleAddButton.style.display = "none";
+      addArticleInput.style.top = "0px";
+      const articlesContainer = document.querySelector(".articlesContainer");
+      articlesContainer.style.top = "0px";
+      categorie.style.display = "none";
+    }
+  });
   // Append the profile image and input elements to the section element
   section.appendChild(profileImage);
-  section.appendChild(input);
+  section.appendChild(textArea);
 
   // Create the POST button
   const articleAddButton = document.createElement("button");
   articleAddButton.classList.add("articleAddBtn");
   articleAddButton.setAttribute("type", "submit");
   articleAddButton.textContent = "Share";
+  articleAddButton.style = "display: none;";
+  articleAddButton.style.margin = "0px";
+  articleAddButton.addEventListener("click", () => {
+    submitArticle();
+  });
+  //we will make a select element to chose the categorie
+  const categorie = document.createElement("select");
 
+  categorie.style =
+    "outline: none; border: none; display: none; -webkit-appearance: none;-moz-appearance: none;appearance: none;";
+  const categorieName = await fetchCategories();
+  categorieName.forEach((e) => {
+    const option = document.createElement("option");
+    option.setAttribute("value", e.idcategorie);
+    option.textContent = e.nom;
+    categorie.appendChild(option);
+  });
+  const defaultOption = document.createElement("option");
+  defaultOption.setAttribute("value", "default");
+  defaultOption.textContent = "Category";
+  defaultOption.setAttribute("selected", "selected");
+  categorie.appendChild(defaultOption);
+  const choices = document.createElement("div");
+  choices.classList.add("choices");
+  choices.style =
+    "display: flex;justify-content: space-evenly;flex-flow: column;align-items: center;height: 80px;";
+  choices.appendChild(articleAddButton);
+  choices.appendChild(categorie);
   // Append the section and postButton elements to the addPostInput element
   addArticleInput.appendChild(section);
-  addArticleInput.appendChild(articleAddButton);
-
+  addArticleInput.appendChild(choices);
   // Create the Posts element
   const articlesElement = document.createElement("div");
   articlesElement.setAttribute("id", "Posts");
   articlesElement.classList.add("Posts");
   return [addArticleInput, articlesElement];
 }
+submitArticle = async () => {
+  //the title will be the first two words of the text
+  const text = document.querySelector("#textInput").value;
+  const title = text.split(" ").slice(0, 2).join(" ");
+  //the content will be the text without the title
+  const content = text;
+  //we will get the id of the categorie
+  const idcategorie = document.querySelector("select").value;
+  //we will get the id of the user by decoding the token
+  const token = localStorage.getItem("token");
+  const user = parseJwt(token);
+  console.log(user);
+  //we will send an image with the post from picsum
+  const image = `https://picsum.photos/seed/${Math.floor(
+    Math.random() * 1000
+  )}/200/300`;
+  //before sending the post we will check if the user has entered a title and a content
+  if (title.length === 0 || content.length === 0 || idcategorie === "default") {
+    alert("please enter a title and a content");
+    return;
+  }
+  const post = await fetch("http://localhost:3000/articles", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-auth-token": token,
+    },
+    body: JSON.stringify({
+      title: title,
+      content: content,
+      image: image,
+      iduser: +user.iduser,
+      articleCategorie: {
+        create: [
+          {
+            categorie: {
+              connect: {
+                idcategorie: +idcategorie,
+              },
+            },
+          },
+        ],
+      },
+    }),
+  });
+  // sendiding we need to prepend the post to the myPagination
+  const myPagination = document.querySelector(
+    ".articlesContainer .myPagination"
+  );
+  const card = document.createElement("div");
+  card.classList.add("card");
+  card.style =
+    "max-width: 50rem; background-color: #fff ; margin : 10px auto;padding:0 10px 10px";
+  const img = document.createElement("img");
+  img.classList.add("card-img-top");
+  await fetch(`https://picsum.photos/800/300?${user.iduser}`)
+    .then((response) => response.blob())
+    .then((blob) => {
+      const objectURL = URL.createObjectURL(blob);
+      img.src = objectURL;
+    });
+  img.setAttribute("alt", "...");
+  const cardBody = document.createElement("div");
+  cardBody.classList.add("card-body");
+  const h3 = document.createElement("h3");
+  h3.classList.add("card-title");
+  h3.textContent = user.name;
+  const h5 = document.createElement("h5");
+  h5.classList.add("card-title");
+  h5.textContent = title;
+  const p = document.createElement("p");
+  p.classList.add("card-text");
+  p.textContent = content;
+  const button = document.createElement("button");
+  button.classList.add("btn");
+  button.classList.add("btn-primary");
+  button.setAttribute("type", "button");
+  button.style =
+    "margin:0 auto ; display : block; width:fit-content ; background-color:rgb(32, 178, 170)";
+  button.setAttribute("data-bs-toggle", "collapse");
+  button.setAttribute("data-bs-target", `#collapseExample${post.idarticle}`);
+  button.setAttribute("aria-expanded", "false");
+  button.setAttribute("aria-controls", `collapseExample${post.idarticle}`);
+  button.textContent = "show comments";
+  const collapse = document.createElement("div");
+  collapse.classList.add("collapse");
+  collapse.setAttribute("id", `collapseExample${post.idarticle}`);
+  const cardBody2 = document.createElement("div");
+  cardBody2.classList.add("card");
+  cardBody2.classList.add("card-body");
+  const mainDivComments = document.createElement("div");
+  mainDivComments.classList.add("mainDivComments");
+  mainDivComments.classList.add(`mainDivComments${post.idarticle}`);
+  cardBody2.innerHTML = mainDivComments;
+  collapse.appendChild(cardBody2);
+  cardBody.appendChild(h3);
+  cardBody.appendChild(h5);
+  cardBody.appendChild(p);
+  cardBody.appendChild(button);
+  cardBody.appendChild(collapse);
+  card.appendChild(img);
+  card.appendChild(cardBody);
+  myPagination.prepend(card);
+  //make the input empty
+  document.querySelector("#textInput").value = "";
+  document.querySelector("select").value = "default";
+  //closed the textarea (trigerd a mouseleave event) at the addArticleInput
+  document
+    .querySelector(".addArticleInput")
+    .dispatchEvent(new Event("mouseleave"));
+};
