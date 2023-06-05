@@ -48,6 +48,7 @@ router.post("/", (req, res, next) => {
       {
         iduser: user.iduser,
         email: user.email,
+        name: user.name,
       },
       //this is the private key
       process.env.jwtPrivateKey

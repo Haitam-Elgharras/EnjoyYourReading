@@ -37,7 +37,6 @@ router.post("/", async (req, res, next) => {
       },
       process.env.jwtPrivateKey
     );
-    //I have a problem with the scure key it's always take the value from the default.json file
     //if a user login with a valid email and password we send a token to the user and the x-auth-token in the header of the response
     return res.header("x-auth-token", token).send(token);
   } else res.status(400).send("invalid email or password");

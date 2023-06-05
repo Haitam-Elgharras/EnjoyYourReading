@@ -334,11 +334,6 @@ const element = document.createElement("ul");
 
 //calling function with passing parameters and adding inside element which is ul tag
 async function createPagination(totalPages, page, byCategories = 0) {
-  // if (byCategories == 1) {
-  //   // we will create juste one button with the active class and has the number 1
-  //   element.innerHTML = `<li class="first numb active" onclick="createPagination(totalPages, ${page})"><a href="#">${page}</a></li>`;
-  // } else {
-  //for the categories we need to do an if statment to show all the articles of a category in one page
   if (byCategories == 1 || totalPages == 1) {
     //then we will creat just the 1 button with the active class
     loading.style.setProperty("display", "flex");
@@ -1027,7 +1022,6 @@ submitArticle = async () => {
   //we will get the id of the user by decoding the token
   const token = localStorage.getItem("token");
   const user = parseJwt(token);
-  console.log(user);
   //we will send an image with the post from picsum
   const image = `https://picsum.photos/seed/${Math.floor(
     Math.random() * 1000
