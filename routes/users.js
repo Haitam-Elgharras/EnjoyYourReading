@@ -39,7 +39,6 @@ router.get("/:email", (req, res, next) => {
 //POST
 router.post("/", (req, res, next) => {
   //we need to add the token to the header of the response like this :
-
   addUser(req.body).then((user) => {
     if (!user) return res.status("400").send("the user already exist");
     //we add the token to the header of the response to make the user login after the registration directly
