@@ -11,3 +11,5 @@ logs/
 tests/
 Readme.js
 .vercel
+.env
+.env.development.local
