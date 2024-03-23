@@ -11,6 +11,7 @@ if (!process.env.jwtPrivateKey) {
   console.error("FATAL ERROR: jwtPrivateKey is not defined.");
   process.exit(1);
 }
+
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var articlesRouter = require("./routes/articles");
@@ -35,5 +36,9 @@ app.use("/categories", categoriesRouter);
 app.use("/commentaires", commentairesRouter);
 app.use("/auth", authRouter);
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
+
+var port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Listening on port ${port}...`));
+
 // console.log(process.env.NODE_ENV);
 module.exports = app;
