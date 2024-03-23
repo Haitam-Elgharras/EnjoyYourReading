@@ -14,7 +14,7 @@ const {
   deleteUser,
 } = require("../models/users");
 
-//get all users must have two parameters take and skip to make pagination and the url will be like this : http://localhost:3000/users?take=2&skip=2
+//get all users must have two parameters take and skip to make pagination and the url will be like this : /users?take=2&skip=2
 //if we don't use the take and skip parameters the default value will be 10
 router.get("/", (req, res, next) => {
   const take = req.query.take ? parseInt(req.query.take) : 0;

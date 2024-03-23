@@ -40,7 +40,7 @@ This repository contains the source code for a blog project developed using Expr
 2. Access the application in your web browser:
 
    ```text
-   http://localhost:3000
+   
    ```
 
 ## Project Structure

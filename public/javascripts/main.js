@@ -104,6 +104,7 @@ function loginForm() {
       <input type="password" id="loginPassword" name="password"required />
       <label for="password">Password:</label>
       </div>
+      <span style="display:none;" class="error">Invalid Email or Password</span>
       <a href="#" id="submit-animation">
       <span></span>
       <span></span>
@@ -147,26 +148,8 @@ function loginToken(e) {
   })
     .then((res) => {
       if (res.status == 400) {
-        //create a div to show the error message
-        loginDiv.textContent = "";
-
-        const errorDiv = document.createElement("div");
-        errorDiv.setAttribute("class", "error");
-        errorDiv.textContent = "Email or password is wrong";
-        errorDiv.style = "z-index: 3;";
-        loginDiv.appendChild(errorDiv);
-        //remove the loading animation
-        const spans = document.querySelectorAll("#submit-animation span");
-        spans.forEach((span) => span.classList.remove("active"));
-        //make a return button to the login form
-        const returnButton = document.createElement("button");
-        returnButton.setAttribute("class", "custom-btn btn-3");
-        returnButton.textContent = "Return";
-        returnButton.style = "z-index: 3;";
-        loginDiv.appendChild(returnButton);
-        returnButton.addEventListener("click", loginForm);
-        // //will be executed if the email or the password is wrong
-        // e.target.submit();
+        const errorSpan = document.querySelector(".error");
+        errorSpan.style = "display:block; color:red;";
       }
       return res;
     })
@@ -871,7 +854,7 @@ async function categoriesListe() {
   CATEGORIES.appendChild(ul);
 }
 async function fetchCategories() {
-  return fetch("http://localhost:3000/categories")
+  return fetch("/categories")
     .then((response) => response.json())
     .then((data) => data);
 }
@@ -1031,7 +1014,7 @@ submitArticle = async () => {
     alert("please enter a title and a content");
     return;
   }
-  const post = await fetch("http://localhost:3000/articles", {
+  const post = await fetch("/articles", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
