@@ -150,6 +150,9 @@ function loginToken(e) {
       if (res.status == 400) {
         const errorSpan = document.querySelector(".error");
         errorSpan.style = "display:block; color:red;";
+
+        const spans = document.querySelectorAll("#submit-animation span");
+        spans.forEach((span) => span.classList.remove("active"));
       }
       return res;
     })
